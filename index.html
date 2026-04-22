@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carnicería Ana · Pedidos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --verde:       #2d6a1f;
+      --verde-claro: #4a9a32;
+      --verde-bg:    #edf7e8;
+      --crema:       #f7f3ec;
+      --crema2:      #ede7dc;
+      --marron:      #5c3d1e;
+      --marron-claro:#8b6340;
+      --rojo:        #8b1a1a;
+      --rojo-bg:     #fdf0f0;
+      --azul-bg:     #eef4fc;
+      --azul:        #1a4f8b;
+      --ambar-bg:    #fdf6e3;
+      --ambar:       #8b6200;
+      --gris:        #6b6560;
+      --gris-bg:     #f0ede8;
+      --borde:       #d8d0c4;
+      --sombra:      0 2px 12px rgba(0,0,0,0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: var(--crema);
+      color: #2a2017;
+      min-height: 100vh;
+    }
+
+    /* ── CABECERA ── */
+    header {
+      background: var(--marron);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header-icon {
+      width: 34px; height: 34px;
+      background: var(--crema);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .header-icon svg { width: 18px; height: 18px; }
+    .header-title {
+      font-family: 'Cinzel', serif;
+      color: #f5ead8;
+      font-size: 16px;
+      letter-spacing: 0.05em;
+    }
+    .header-title span {
+      color: var(--crema2);
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Lato', sans-serif;
+      letter-spacing: 0.12em;
+      display: block;
+      margin-top: 1px;
+      text-transform: uppercase;
+    }
+    .header-date {
+      color: #c4b49a;
+      font-size: 13px;
+      font-weight: 300;
+    }
+
+    /* ── LAYOUT ── */
+    main { max-width: 1100px; margin: 0 auto; padding: 24px 20px 60px; }
+
+    /* ── STATS ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat {
+      background: #fff;
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      padding: 16px 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+    .stat.s-total::before  { background: var(--marron-claro); }
+    .stat.s-pend::before   { background: var(--ambar); }
+    .stat.s-listo::before  { background: var(--verde-claro); }
+    .stat.s-entre::before  { background: var(--gris); }
+    .stat-lbl { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gris); margin-bottom: 6px; }
+    .stat-num { font-size: 32px; font-weight: 700; color: #2a2017; line-height: 1; }
+    .stat-sub { font-size: 11px; color: var(--gris); margin-top: 4px; }
+
+    /* ── FORMULARIO ── */
+    .form-card {
+      background: #fff;
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      padding: 20px 22px;
+      margin-bottom: 20px;
+    }
+    .form-card-title {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      color: var(--marron);
+      letter-spacing: 0.08em;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .form-card-title::before {
+      content: '';
+      display: inline-block;
+      width: 3px; height: 14px;
+      background: var(--verde-claro);
+      border-radius: 2px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.7fr 0.7fr 2fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+    .fg { display: flex; flex-direction: column; gap: 4px; }
+    .fg label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gris); }
+    .fg input, .fg select {
+      height: 38px;
+      border: 1px solid var(--borde);
+      border-radius: 8px;
+      padding: 0 12px;
+      font-family: 'Lato', sans-serif;
+      font-size: 13.5px;
+      color: #2a2017;
+      background: var(--crema);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .fg input:focus, .fg select:focus { border-color: var(--verde-claro); background: #fff; }
+    .btn-add {
+      height: 38px;
+      background: var(--verde);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0 20px;
+      font-family: 'Lato', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .btn-add:hover { background: var(--verde-claro); }
+    .btn-add:active { transform: scale(0.97); }
+
+    /* ── TOOLBAR ── */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .filters { display: flex; gap: 6px; flex-wrap: wrap; }
+    .f-btn {
+      background: #fff;
+      border: 1px solid var(--borde);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-family: 'Lato', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--gris);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .f-btn:hover { border-color: var(--marron-claro); color: var(--marron); }
+    .f-btn.on { background: var(--marron); color: #f5ead8; border-color: var(--marron); }
+    .actions { display: flex; gap: 8px; }
+    .btn-sec {
+      background: #fff;
+      border: 1px solid var(--borde);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-family: 'Lato', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--gris);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-sec:hover { background: var(--crema2); color: #2a2017; }
+
+    /* ── TABLA ── */
+    .tbl-card {
+      background: #fff;
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .tbl-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      table-layout: fixed;
+    }
+    thead { background: var(--crema); }
+    th {
+      text-align: left;
+      padding: 11px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--marron-claro);
+      border-bottom: 1px solid var(--borde);
+      white-space: nowrap;
+    }
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #f0ece6;
+      color: #2a2017;
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #faf7f2; }
+    tr.entregado td { opacity: 0.5; }
+
+    .td-cliente { font-weight: 700; }
+    .td-hora { font-family: 'Lato', sans-serif; font-weight: 700; color: var(--marron); }
+    .td-detalle { color: #5a4f43; font-size: 13px; }
+
+    /* badges categoría */
+    .cat {
+      display: inline-block;
+      border-radius: 5px;
+      padding: 3px 9px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+    .cat-carne   { background: #fdf0ec; color: var(--rojo); }
+    .cat-bandeja { background: #eef0fd; color: #1a2a8b; }
+    .cat-super   { background: var(--verde-bg); color: var(--verde); }
+    .cat-encargo { background: var(--ambar-bg); color: var(--ambar); }
+
+    /* badges estado */
+    .estado {
+      display: inline-block;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: filter 0.15s, transform 0.1s;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .estado:hover { filter: brightness(0.92); transform: scale(1.04); }
+    .estado-pendiente  { background: var(--ambar-bg);  color: var(--ambar); border: 1px solid #e8d08a; }
+    .estado-preparando { background: var(--azul-bg);   color: var(--azul);  border: 1px solid #a8c4e8; }
+    .estado-listo      { background: var(--verde-bg);  color: var(--verde); border: 1px solid #9dd47e; }
+    .estado-entregado  { background: var(--gris-bg);   color: var(--gris);  border: 1px solid #ccc6be; }
+
+    .td-nota input {
+      width: 100%;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-family: 'Lato', sans-serif;
+      font-size: 12px;
+      color: #5a4f43;
+      background: transparent;
+      outline: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .td-nota input:focus { border-color: var(--borde); background: var(--crema); }
+    .td-nota input::placeholder { color: #bbb; }
+
+    .btn-del {
+      background: none;
+      border: none;
+      color: #ccc;
+      font-size: 18px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 2px 6px;
+      border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+    }
+    .btn-del:hover { color: var(--rojo); background: var(--rojo-bg); }
+
+    .empty {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--gris);
+      font-size: 14px;
+    }
+    .empty strong { display: block; font-size: 18px; margin-bottom: 6px; color: var(--crema2); }
+
+    /* ── FECHA RECOGIDA ── */
+    .fecha-hoy     { color: var(--verde);  font-weight: 700; }
+    .fecha-futura  { color: var(--azul);   font-weight: 700; }
+    .fecha-pasada  { color: var(--rojo);   font-weight: 700; }
+    .fecha-badge {
+      display: inline-block;
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 5px;
+      white-space: nowrap;
+    }
+    .fecha-badge.hoy    { background: var(--verde-bg); color: var(--verde); }
+    .fecha-badge.futura { background: var(--azul-bg);  color: var(--azul);  }
+    .fecha-badge.pasada { background: var(--rojo-bg);  color: var(--rojo);  }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed;
+      bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--marron);
+      color: #f5ead8;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      transition: transform 0.3s ease;
+      z-index: 999;
+      pointer-events: none;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ── FOOTER INFO ── */
+    .footer-tip {
+      margin-top: 28px;
+      background: var(--ambar-bg);
+      border: 1px solid #e8d08a;
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 13px;
+      color: var(--ambar);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .footer-tip svg { flex-shrink: 0; margin-top: 1px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .form-grid { grid-template-columns: 1fr 1fr; }
+      .form-grid .fg:nth-child(4) { grid-column: 1 / -1; }
+      .form-grid .btn-add { grid-column: 1 / -1; height: 44px; }
+      th:nth-child(5), td:nth-child(5),
+      th:nth-child(7), td:nth-child(7) { display: none; }
+    }
+    @media (max-width: 480px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .header-date { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">
+    <div class="header-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#5c3d1e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 3l7 7M17 3l-4 4 4 4-4 4 4 4"/>
+        <path d="M10 10l4 4M3 21l7-7"/>
+      </svg>
+    </div>
+    <div class="header-title">
+      Carnicería Ana
+      <span>Gestión de pedidos</span>
+    </div>
+  </div>
+  <div class="header-date" id="header-date"></div>
+</header>
+
+<main>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat s-total">
+      <div class="stat-lbl">Total hoy</div>
+      <div class="stat-num" id="s-total">0</div>
+      <div class="stat-sub">pedidos registrados</div>
+    </div>
+    <div class="stat s-pend">
+      <div class="stat-lbl">Pendientes</div>
+      <div class="stat-num" id="s-pend">0</div>
+      <div class="stat-sub">por preparar</div>
+    </div>
+    <div class="stat s-listo">
+      <div class="stat-lbl">Listos</div>
+      <div class="stat-num" id="s-listo">0</div>
+      <div class="stat-sub">para recoger</div>
+    </div>
+    <div class="stat s-entre">
+      <div class="stat-lbl">Entregados</div>
+      <div class="stat-num" id="s-entre">0</div>
+      <div class="stat-sub">completados</div>
+    </div>
+  </div>
+
+  <!-- FORMULARIO -->
+  <div class="form-card">
+    <div class="form-card-title">Nuevo pedido</div>
+    <div class="form-grid">
+      <div class="fg">
+        <label>Cliente</label>
+        <input type="text" id="f-cliente" placeholder="Nombre o teléfono">
+      </div>
+      <div class="fg">
+        <label>Fecha recogida</label>
+        <input type="date" id="f-fecha">
+      </div>
+      <div class="fg">
+        <label>Hora recogida</label>
+        <input type="time" id="f-hora">
+      </div>
+      <div class="fg">
+        <label>Detalle del pedido</label>
+        <input type="text" id="f-detalle" placeholder="Ej: Entrecot 800g + chuletas cerdo x4">
+      </div>
+      <div class="fg">
+        <label>Categoría</label>
+        <select id="f-cat">
+          <option value="carne">🥩 Carnicería</option>
+          <option value="bandeja">🍽 Bandeja especial</option>
+          <option value="super">🛒 Supermercado</option>
+          <option value="encargo">⭐ Encargo especial</option>
+        </select>
+      </div>
+      <button class="btn-add" onclick="addPedido()">+ Añadir</button>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="filters" id="filtros">
+      <button class="f-btn on" onclick="setFiltro('todos',this)">Todos</button>
+      <button class="f-btn" onclick="setFiltro('pendiente',this)">Pendientes</button>
+      <button class="f-btn" onclick="setFiltro('preparando',this)">Preparando</button>
+      <button class="f-btn" onclick="setFiltro('listo',this)">Listos</button>
+      <button class="f-btn" onclick="setFiltro('entregado',this)">Entregados</button>
+    </div>
+    <div class="actions">
+      <button class="btn-sec" onclick="limpiarEntregados()">Limpiar entregados</button>
+      <button class="btn-sec" onclick="exportCSV()">Exportar CSV</button>
+      <button class="btn-sec" onclick="exportTexto()">Copiar resumen</button>
+    </div>
+  </div>
+
+  <!-- TABLA -->
+  <div class="tbl-card">
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:13%">Cliente</th>
+            <th style="width:11%">Recogida</th>
+            <th style="width:7%">Hora</th>
+            <th style="width:28%">Pedido</th>
+            <th style="width:11%">Categoría</th>
+            <th style="width:12%">Estado</th>
+            <th style="width:13%">Notas</th>
+            <th style="width:5%"></th>
+          </tr>
+        </thead>
+        <tbody id="tbl-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TIP -->
+  <div class="footer-tip">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span>Haz clic sobre el <strong>estado</strong> de cualquier pedido para avanzarlo: Pendiente → Preparando → Listo → Entregado. Los pedidos se guardan automáticamente en el navegador y se recuperan al reabrir la página.</span>
+  </div>
+
+</main>
+
+<div id="toast"></div>
+
+<script>
+  const CAT_LABELS = { carne:'Carnicería', bandeja:'Bandeja', super:'Supermercado', encargo:'Encargo' };
+  const ESTADOS = ['pendiente','preparando','listo','entregado'];
+  let pedidos = [];
+  let nextId = 1;
+  let filtro = 'todos';
+
+  function guardar() {
+    localStorage.setItem('pedidos_ana', JSON.stringify({ pedidos, nextId }));
+  }
+  function cargar() {
+    try {
+      const d = JSON.parse(localStorage.getItem('pedidos_ana') || 'null');
+      if (d) { pedidos = d.pedidos; nextId = d.nextId; }
+    } catch(e) {}
+    if (!pedidos.length) pedidos = [
+      { id:1, cliente:'María García',    fecha: new Date().toISOString().slice(0,10), hora:'10:00', detalle:'Entrecot ternera 800g + chuletas cerdo x4', cat:'carne',   estado:'listo',      notas:'' },
+      { id:2, cliente:'Juan Rodríguez',  fecha: new Date().toISOString().slice(0,10), hora:'13:00', detalle:'Bandeja mixta barbacoa 1kg',                cat:'bandeja', estado:'pendiente',  notas:'Sin picante' },
+      { id:3, cliente:'Ana Martínez',    fecha: new Date(Date.now()+86400000).toISOString().slice(0,10), hora:'11:30', detalle:'Pollo entero + costillas cerdo', cat:'encargo', estado:'preparando', notas:'Sábado' },
+      { id:4, cliente:'Luis Pérez',      fecha: new Date().toISOString().slice(0,10), hora:'09:30', detalle:'Leche, pan, aceite, huevos x12',           cat:'super',   estado:'entregado',  notas:'' }
+    ];
+    nextId = Math.max(...pedidos.map(p=>p.id)) + 1;
+  }
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  function render() {
+    const hoy = new Date();
+    document.getElementById('header-date').textContent =
+      hoy.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
+
+    document.getElementById('s-total').textContent = pedidos.length;
+    document.getElementById('s-pend').textContent  = pedidos.filter(p=>p.estado==='pendiente').length;
+    document.getElementById('s-listo').textContent = pedidos.filter(p=>p.estado==='listo').length;
+    document.getElementById('s-entre').textContent = pedidos.filter(p=>p.estado==='entregado').length;
+
+    const vis = filtro === 'todos' ? pedidos : pedidos.filter(p=>p.estado===filtro);
+    const body = document.getElementById('tbl-body');
+
+    if (!vis.length) {
+      body.innerHTML = `<tr><td colspan="8"><div class="empty"><strong>—</strong>No hay pedidos en este estado</div></td></tr>`;
+      return;
+    }
+
+    const sorted = [...vis].sort((a,b)=>{
+      const ord = {pendiente:0,preparando:1,listo:2,entregado:3};
+      if (ord[a.estado] !== ord[b.estado]) return ord[a.estado]-ord[b.estado];
+      const fa = (a.fecha||'9999') + (a.hora||'');
+      const fb = (b.fecha||'9999') + (b.hora||'');
+      return fa.localeCompare(fb);
+    });
+
+    const hoyStr = new Date().toISOString().slice(0,10);
+
+    body.innerHTML = sorted.map(p => {
+      const f = p.fecha || '';
+      let fechaHtml = '—';
+      if (f) {
+        const d = new Date(f + 'T00:00:00');
+        const label = d.toLocaleDateString('es-ES',{day:'numeric',month:'short'});
+        let cls = 'futura';
+        if (f === hoyStr) cls = 'hoy';
+        else if (f < hoyStr) cls = 'pasada';
+        fechaHtml = `<span class="fecha-badge ${cls}">${label}</span>`;
+      }
+      return `
+      <tr class="${p.estado==='entregado'?'entregado':''}">
+        <td class="td-cliente">${esc(p.cliente)}</td>
+        <td>${fechaHtml}</td>
+        <td class="td-hora">${p.hora||'—'}</td>
+        <td class="td-detalle">${esc(p.detalle)}</td>
+        <td><span class="cat cat-${p.cat}">${CAT_LABELS[p.cat]}</span></td>
+        <td><span class="estado estado-${p.estado}" onclick="avanzar(${p.id})" title="Clic para cambiar estado">${p.estado}</span></td>
+        <td class="td-nota"><input type="text" value="${esc(p.notas)}" placeholder="Notas..." onchange="setNota(${p.id},this.value)"></td>
+        <td><button class="btn-del" onclick="del(${p.id})" title="Eliminar">×</button></td>
+      </tr>`;
+    }).join('');
+  }
+
+  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  function addPedido() {
+    const cliente = document.getElementById('f-cliente').value.trim();
+    const detalle = document.getElementById('f-detalle').value.trim();
+    if (!cliente) { document.getElementById('f-cliente').focus(); return; }
+    if (!detalle) { document.getElementById('f-detalle').focus(); return; }
+    pedidos.push({
+      id: nextId++,
+      cliente,
+      fecha: document.getElementById('f-fecha').value || '',
+      hora: document.getElementById('f-hora').value || '',
+      detalle,
+      cat: document.getElementById('f-cat').value,
+      estado: 'pendiente',
+      notas: ''
+    });
+    const _fec = document.getElementById('f-fecha').value;
+    const _hor = document.getElementById('f-hora').value;
+    document.getElementById('f-cliente').value = '';
+    document.getElementById('f-detalle').value = '';
+    document.getElementById('f-hora').value = '';
+    document.getElementById('f-fecha').value = new Date().toISOString().slice(0,10);
+    document.getElementById('f-cliente').focus();
+    guardar(); render();
+    const _fd = _fec ? new Date(_fec+'T00:00:00').toLocaleDateString('es-ES',{day:'numeric',month:'short'}) : '';
+    const _fh = _hor || '';
+    const _cuando = [_fd, _fh].filter(Boolean).join(' · ');
+    toast('Pedido añadido' + (_cuando ? '  ·  ' + _cuando : ''));
+  }
+
+  function avanzar(id) {
+    const p = pedidos.find(x=>x.id===id);
+    if (!p) return;
+    const next = ESTADOS[(ESTADOS.indexOf(p.estado)+1) % ESTADOS.length];
+    p.estado = next;
+    guardar(); render();
+    const labels = {pendiente:'Pendiente',preparando:'Preparando',listo:'Listo ✓',entregado:'Entregado'};
+    toast(p.cliente + ' → ' + labels[next]);
+  }
+
+  function setNota(id, val) {
+    const p = pedidos.find(x=>x.id===id);
+    if (p) { p.notas = val; guardar(); }
+  }
+
+  function del(id) {
+    const p = pedidos.find(x=>x.id===id);
+    if (p && confirm('¿Eliminar el pedido de ' + p.cliente + '?')) {
+      pedidos = pedidos.filter(x=>x.id!==id);
+      guardar(); render();
+    }
+  }
+
+  function limpiarEntregados() {
+    const n = pedidos.filter(p=>p.estado==='entregado').length;
+    if (!n) { toast('No hay entregados'); return; }
+    if (confirm('¿Eliminar ' + n + ' pedido(s) entregado(s)?')) {
+      pedidos = pedidos.filter(p=>p.estado!=='entregado');
+      guardar(); render();
+      toast(n + ' pedido(s) eliminados');
+    }
+  }
+
+  function exportCSV() {
+    const hoy = new Date().toISOString().slice(0,10);
+    const header = 'Cliente,Fecha recogida,Hora,Pedido,Categoría,Estado,Notas';
+    const rows = pedidos.map(p =>
+      [p.cliente, p.fecha||'', p.hora||'', p.detalle, CAT_LABELS[p.cat], p.estado, p.notas]
+        .map(v => '"' + String(v).replace(/"/g,'""') + '"').join(','));
+    const csv = '\uFEFF' + [header,...rows].join('\n');
+    const a = document.createElement('a');
+    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+    a.download = 'pedidos_' + hoy + '.csv';
+    a.click();
+    toast('CSV exportado');
+  }
+
+  function exportTexto() {
+    const hoy = new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
+    const activos = pedidos.filter(p=>p.estado!=='entregado');
+    if (!activos.length) { toast('No hay pedidos activos'); return; }
+    const txt = '📋 PEDIDOS ' + hoy.toUpperCase() + '\n\n' +
+      activos.map(p => {
+        const fecha = p.fecha ? new Date(p.fecha+'T00:00:00').toLocaleDateString('es-ES',{weekday:'short',day:'numeric',month:'short'}) : '—';
+        return `${fecha} ${p.hora||''}  ${p.cliente}\n   ${p.detalle}${p.notas?' ('+p.notas+')':''}\n   Estado: ${p.estado.toUpperCase()}`;
+      }).join('\n\n');
+    navigator.clipboard.writeText(txt).then(() => toast('Resumen copiado al portapapeles'));
+  }
+
+  function setFiltro(f, btn) {
+    filtro = f;
+    document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    render();
+  }
+
+  document.getElementById('f-detalle').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addPedido();
+  });
+
+  document.getElementById('f-fecha').value = new Date().toISOString().slice(0,10);
+
+  cargar(); render();
+</script>
+</body>
+</html>
