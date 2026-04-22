@@ -26,16 +26,16 @@
       --borde:       #d8d0c4;
       --sombra:      0 2px 12px rgba(0,0,0,0.08);
     }
-
+ 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
+ 
     body {
       font-family: 'Lato', sans-serif;
       background: var(--crema);
       color: #2a2017;
       min-height: 100vh;
     }
-
+ 
     /* ── CABECERA ── */
     header {
       background: var(--marron);
@@ -81,10 +81,10 @@
       font-size: 13px;
       font-weight: 300;
     }
-
+ 
     /* ── LAYOUT ── */
     main { max-width: 1100px; margin: 0 auto; padding: 24px 20px 60px; }
-
+ 
     /* ── STATS ── */
     .stats {
       display: grid;
@@ -113,7 +113,7 @@
     .stat-lbl { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gris); margin-bottom: 6px; }
     .stat-num { font-size: 32px; font-weight: 700; color: #2a2017; line-height: 1; }
     .stat-sub { font-size: 11px; color: var(--gris); margin-top: 4px; }
-
+ 
     /* ── FORMULARIO ── */
     .form-card {
       background: #fff;
@@ -177,7 +177,7 @@
     }
     .btn-add:hover { background: var(--verde-claro); }
     .btn-add:active { transform: scale(0.97); }
-
+ 
     /* ── TOOLBAR ── */
     .toolbar {
       display: flex;
@@ -218,7 +218,7 @@
       transition: all 0.15s;
     }
     .btn-sec:hover { background: var(--crema2); color: #2a2017; }
-
+ 
     /* ── TABLA ── */
     .tbl-card {
       background: #fff;
@@ -254,11 +254,11 @@
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: #faf7f2; }
     tr.entregado td { opacity: 0.5; }
-
+ 
     .td-cliente { font-weight: 700; }
     .td-hora { font-family: 'Lato', sans-serif; font-weight: 700; color: var(--marron); }
     .td-detalle { color: #5a4f43; font-size: 13px; }
-
+ 
     /* badges categoría */
     .cat {
       display: inline-block;
@@ -273,7 +273,7 @@
     .cat-bandeja { background: #eef0fd; color: #1a2a8b; }
     .cat-super   { background: var(--verde-bg); color: var(--verde); }
     .cat-encargo { background: var(--ambar-bg); color: var(--ambar); }
-
+ 
     /* badges estado */
     .estado {
       display: inline-block;
@@ -292,7 +292,7 @@
     .estado-preparando { background: var(--azul-bg);   color: var(--azul);  border: 1px solid #a8c4e8; }
     .estado-listo      { background: var(--verde-bg);  color: var(--verde); border: 1px solid #9dd47e; }
     .estado-entregado  { background: var(--gris-bg);   color: var(--gris);  border: 1px solid #ccc6be; }
-
+ 
     .td-nota input {
       width: 100%;
       border: 1px solid transparent;
@@ -307,7 +307,7 @@
     }
     .td-nota input:focus { border-color: var(--borde); background: var(--crema); }
     .td-nota input::placeholder { color: #bbb; }
-
+ 
     .btn-del {
       background: none;
       border: none;
@@ -320,7 +320,7 @@
       transition: color 0.15s, background 0.15s;
     }
     .btn-del:hover { color: var(--rojo); background: var(--rojo-bg); }
-
+ 
     .empty {
       text-align: center;
       padding: 48px 20px;
@@ -328,7 +328,7 @@
       font-size: 14px;
     }
     .empty strong { display: block; font-size: 18px; margin-bottom: 6px; color: var(--crema2); }
-
+ 
     /* ── FECHA RECOGIDA ── */
     .fecha-hoy     { color: var(--verde);  font-weight: 700; }
     .fecha-futura  { color: var(--azul);   font-weight: 700; }
@@ -343,7 +343,7 @@
     .fecha-badge.hoy    { background: var(--verde-bg); color: var(--verde); }
     .fecha-badge.futura { background: var(--azul-bg);  color: var(--azul);  }
     .fecha-badge.pasada { background: var(--rojo-bg);  color: var(--rojo);  }
-
+ 
     /* ── TOAST ── */
     #toast {
       position: fixed;
@@ -361,7 +361,7 @@
       pointer-events: none;
     }
     #toast.show { transform: translateX(-50%) translateY(0); }
-
+ 
     /* ── FOOTER INFO ── */
     .footer-tip {
       margin-top: 28px;
@@ -376,24 +376,25 @@
       gap: 10px;
     }
     .footer-tip svg { flex-shrink: 0; margin-top: 1px; }
-
+ 
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
       .stats { grid-template-columns: repeat(2, 1fr); }
       .form-grid { grid-template-columns: 1fr 1fr; }
       .form-grid .fg:nth-child(4) { grid-column: 1 / -1; }
       .form-grid .btn-add { grid-column: 1 / -1; height: 44px; }
-      th:nth-child(5), td:nth-child(5),
-      th:nth-child(7), td:nth-child(7) { display: none; }
+      th:nth-child(4), td:nth-child(4),
+      th:nth-child(6), td:nth-child(6) { display: none; }
     }
     @media (max-width: 480px) {
       .stats { grid-template-columns: repeat(2, 1fr); }
       .header-date { display: none; }
+      th:nth-child(3), td:nth-child(3) { display: none; }
     }
   </style>
 </head>
 <body>
-
+ 
 <header>
   <div class="header-brand">
     <div class="header-icon">
@@ -409,9 +410,9 @@
   </div>
   <div class="header-date" id="header-date"></div>
 </header>
-
+ 
 <main>
-
+ 
   <!-- STATS -->
   <div class="stats">
     <div class="stat s-total">
@@ -435,7 +436,7 @@
       <div class="stat-sub">completados</div>
     </div>
   </div>
-
+ 
   <!-- FORMULARIO -->
   <div class="form-card">
     <div class="form-card-title">Nuevo pedido</div>
@@ -468,7 +469,7 @@
       <button class="btn-add" onclick="addPedido()">+ Añadir</button>
     </div>
   </div>
-
+ 
   <!-- TOOLBAR -->
   <div class="toolbar">
     <div class="filters" id="filtros">
@@ -484,20 +485,19 @@
       <button class="btn-sec" onclick="exportTexto()">Copiar resumen</button>
     </div>
   </div>
-
+ 
   <!-- TABLA -->
   <div class="tbl-card">
     <div class="tbl-wrap">
       <table>
         <thead>
           <tr>
-            <th style="width:13%">Cliente</th>
-            <th style="width:11%">Recogida</th>
-            <th style="width:7%">Hora</th>
-            <th style="width:28%">Pedido</th>
+            <th style="width:14%">Cliente</th>
+            <th style="width:14%">Recogida</th>
+            <th style="width:29%">Pedido</th>
             <th style="width:11%">Categoría</th>
             <th style="width:12%">Estado</th>
-            <th style="width:13%">Notas</th>
+            <th style="width:15%">Notas</th>
             <th style="width:5%"></th>
           </tr>
         </thead>
@@ -505,24 +505,24 @@
       </table>
     </div>
   </div>
-
+ 
   <!-- TIP -->
   <div class="footer-tip">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
     <span>Haz clic sobre el <strong>estado</strong> de cualquier pedido para avanzarlo: Pendiente → Preparando → Listo → Entregado. Los pedidos se guardan automáticamente en el navegador y se recuperan al reabrir la página.</span>
   </div>
-
+ 
 </main>
-
+ 
 <div id="toast"></div>
-
+ 
 <script>
   const CAT_LABELS = { carne:'Carnicería', bandeja:'Bandeja', super:'Supermercado', encargo:'Encargo' };
   const ESTADOS = ['pendiente','preparando','listo','entregado'];
   let pedidos = [];
   let nextId = 1;
   let filtro = 'todos';
-
+ 
   function guardar() {
     localStorage.setItem('pedidos_ana', JSON.stringify({ pedidos, nextId }));
   }
@@ -539,32 +539,32 @@
     ];
     nextId = Math.max(...pedidos.map(p=>p.id)) + 1;
   }
-
+ 
   function toast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2200);
   }
-
+ 
   function render() {
     const hoy = new Date();
     document.getElementById('header-date').textContent =
       hoy.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
-
+ 
     document.getElementById('s-total').textContent = pedidos.length;
     document.getElementById('s-pend').textContent  = pedidos.filter(p=>p.estado==='pendiente').length;
     document.getElementById('s-listo').textContent = pedidos.filter(p=>p.estado==='listo').length;
     document.getElementById('s-entre').textContent = pedidos.filter(p=>p.estado==='entregado').length;
-
+ 
     const vis = filtro === 'todos' ? pedidos : pedidos.filter(p=>p.estado===filtro);
     const body = document.getElementById('tbl-body');
-
+ 
     if (!vis.length) {
-      body.innerHTML = `<tr><td colspan="8"><div class="empty"><strong>—</strong>No hay pedidos en este estado</div></td></tr>`;
+      body.innerHTML = `<tr><td colspan="7"><div class="empty"><strong>—</strong>No hay pedidos en este estado</div></td></tr>`;
       return;
     }
-
+ 
     const sorted = [...vis].sort((a,b)=>{
       const ord = {pendiente:0,preparando:1,listo:2,entregado:3};
       if (ord[a.estado] !== ord[b.estado]) return ord[a.estado]-ord[b.estado];
@@ -572,25 +572,27 @@
       const fb = (b.fecha||'9999') + (b.hora||'');
       return fa.localeCompare(fb);
     });
-
+ 
     const hoyStr = new Date().toISOString().slice(0,10);
-
+ 
     body.innerHTML = sorted.map(p => {
       const f = p.fecha || '';
-      let fechaHtml = '—';
+      let fechaBadge = '';
       if (f) {
         const d = new Date(f + 'T00:00:00');
         const label = d.toLocaleDateString('es-ES',{day:'numeric',month:'short'});
         let cls = 'futura';
         if (f === hoyStr) cls = 'hoy';
         else if (f < hoyStr) cls = 'pasada';
-        fechaHtml = `<span class="fecha-badge ${cls}">${label}</span>`;
+        fechaBadge = `<span class="fecha-badge ${cls}">${label}</span>`;
       }
+      const horaStr = p.hora ? `<span class="td-hora" style="display:block;margin-top:3px;font-size:13px;">${p.hora}</span>` : '';
+      const recogidaHtml = (fechaBadge || horaStr) ? `${fechaBadge}${horaStr}` : '—';
+ 
       return `
       <tr class="${p.estado==='entregado'?'entregado':''}">
         <td class="td-cliente">${esc(p.cliente)}</td>
-        <td>${fechaHtml}</td>
-        <td class="td-hora">${p.hora||'—'}</td>
+        <td style="white-space:nowrap;">${recogidaHtml}</td>
         <td class="td-detalle">${esc(p.detalle)}</td>
         <td><span class="cat cat-${p.cat}">${CAT_LABELS[p.cat]}</span></td>
         <td><span class="estado estado-${p.estado}" onclick="avanzar(${p.id})" title="Clic para cambiar estado">${p.estado}</span></td>
@@ -599,9 +601,9 @@
       </tr>`;
     }).join('');
   }
-
+ 
   function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
+ 
   function addPedido() {
     const cliente = document.getElementById('f-cliente').value.trim();
     const detalle = document.getElementById('f-detalle').value.trim();
@@ -630,7 +632,7 @@
     const _cuando = [_fd, _fh].filter(Boolean).join(' · ');
     toast('Pedido añadido' + (_cuando ? '  ·  ' + _cuando : ''));
   }
-
+ 
   function avanzar(id) {
     const p = pedidos.find(x=>x.id===id);
     if (!p) return;
@@ -640,12 +642,12 @@
     const labels = {pendiente:'Pendiente',preparando:'Preparando',listo:'Listo ✓',entregado:'Entregado'};
     toast(p.cliente + ' → ' + labels[next]);
   }
-
+ 
   function setNota(id, val) {
     const p = pedidos.find(x=>x.id===id);
     if (p) { p.notas = val; guardar(); }
   }
-
+ 
   function del(id) {
     const p = pedidos.find(x=>x.id===id);
     if (p && confirm('¿Eliminar el pedido de ' + p.cliente + '?')) {
@@ -653,7 +655,7 @@
       guardar(); render();
     }
   }
-
+ 
   function limpiarEntregados() {
     const n = pedidos.filter(p=>p.estado==='entregado').length;
     if (!n) { toast('No hay entregados'); return; }
@@ -663,7 +665,7 @@
       toast(n + ' pedido(s) eliminados');
     }
   }
-
+ 
   function exportCSV() {
     const hoy = new Date().toISOString().slice(0,10);
     const header = 'Cliente,Fecha recogida,Hora,Pedido,Categoría,Estado,Notas';
@@ -677,7 +679,7 @@
     a.click();
     toast('CSV exportado');
   }
-
+ 
   function exportTexto() {
     const hoy = new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
     const activos = pedidos.filter(p=>p.estado!=='entregado');
@@ -689,20 +691,20 @@
       }).join('\n\n');
     navigator.clipboard.writeText(txt).then(() => toast('Resumen copiado al portapapeles'));
   }
-
+ 
   function setFiltro(f, btn) {
     filtro = f;
     document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('on'));
     btn.classList.add('on');
     render();
   }
-
+ 
   document.getElementById('f-detalle').addEventListener('keydown', e => {
     if (e.key === 'Enter') addPedido();
   });
-
+ 
   document.getElementById('f-fecha').value = new Date().toISOString().slice(0,10);
-
+ 
   cargar(); render();
 </script>
 </body>
