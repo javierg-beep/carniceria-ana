@@ -675,13 +675,18 @@
   let nextId = 1;
   let filtro = 'todos';
 
-  function guardar() {
-    localStorage.setItem('pedidos_ana', JSON.stringify({ pedidos, nextId }));
-  }
-  function cargar() {
+  async function guardar() {
     try {
-      const d = JSON.parse(localStorage.getItem('pedidos_ana') || 'null');
-      if (d) { pedidos = d.pedidos; nextId = d.nextId; }
+      await window.storage.set('pedidos_ana', JSON.stringify({ pedidos, nextId }));
+    } catch(e) {}
+  }
+  async function cargar() {
+    try {
+      const result = await window.storage.get('pedidos_ana');
+      if (result && result.value) {
+        const d = JSON.parse(result.value);
+        if (d) { pedidos = d.pedidos; nextId = d.nextId; }
+      }
     } catch(e) {}
     if (!pedidos.length) pedidos = [
       { id:1, cliente:'María García',    fecha: new Date().toISOString().slice(0,10), hora:'10:00', detalle:'Entrecot ternera 800g + chuletas cerdo x4', cat:'carne',   estado:'listo',      notas:'' },
@@ -760,7 +765,7 @@
   function cap(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
   function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-  function addPedido() {
+  async function addPedido() {
     const cliente = document.getElementById('f-cliente').value.trim();
     const detalle = document.getElementById('f-detalle').value.trim();
     if (!cliente) { document.getElementById('f-cliente').focus(); return; }
@@ -782,42 +787,42 @@
     document.getElementById('f-hora').value = '';
     document.getElementById('f-fecha').value = new Date().toISOString().slice(0,10);
     document.getElementById('f-cliente').focus();
-    guardar(); render();
+    await guardar(); render();
     const _fd = _fec ? new Date(_fec+'T00:00:00').toLocaleDateString('es-ES',{day:'numeric',month:'short'}) : '';
     const _fh = _hor || '';
     const _cuando = [_fd, _fh].filter(Boolean).join(' · ');
     toast('Pedido añadido' + (_cuando ? '  ·  ' + _cuando : ''));
   }
 
-  function avanzar(id) {
+  async function avanzar(id) {
     const p = pedidos.find(x=>x.id===id);
     if (!p) return;
     const next = ESTADOS[(ESTADOS.indexOf(p.estado)+1) % ESTADOS.length];
     p.estado = next;
-    guardar(); render();
+    await guardar(); render();
     const labels = {pendiente:'Pendiente',preparando:'Preparando',listo:'Listo ✓',entregado:'Entregado'};
     toast(p.cliente + ' → ' + labels[next]);
   }
 
-  function setNota(id, val) {
+  async function setNota(id, val) {
     const p = pedidos.find(x=>x.id===id);
-    if (p) { p.notas = val; guardar(); }
+    if (p) { p.notas = val; await guardar(); }
   }
 
-  function del(id) {
+  async function del(id) {
     const p = pedidos.find(x=>x.id===id);
     if (p && confirm('¿Eliminar el pedido de ' + p.cliente + '?')) {
       pedidos = pedidos.filter(x=>x.id!==id);
-      guardar(); render();
+      await guardar(); render();
     }
   }
 
-  function limpiarEntregados() {
+  async function limpiarEntregados() {
     const n = pedidos.filter(p=>p.estado==='entregado').length;
     if (!n) { toast('No hay entregados'); return; }
     if (confirm('¿Eliminar ' + n + ' pedido(s) entregado(s)?')) {
       pedidos = pedidos.filter(p=>p.estado!=='entregado');
-      guardar(); render();
+      await guardar(); render();
       toast(n + ' pedido(s) eliminados');
     }
   }
@@ -919,11 +924,11 @@
     document.getElementById('detalle-panel').style.display = 'block';
   }
 
-  function cambiarEstadoDetalle(id, nuevoEstado) {
+  async function cambiarEstadoDetalle(id, nuevoEstado) {
     const p = pedidos.find(x=>x.id===id);
     if (!p) return;
     p.estado = nuevoEstado;
-    guardar(); render();
+    await guardar(); render();
     abrirDetalle(id, null);
     toast(p.cliente + ' → ' + nuevoEstado);
   }
@@ -934,8 +939,6 @@
   }
 
   document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarDetalle(); });
-
-  cargar(); render();
 
 
   function setFiltroStat(f) {
@@ -954,7 +957,7 @@
   });
   document.getElementById('f-fecha').value = new Date().toISOString().slice(0,10);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarDetalle(); });
-  cargar(); render();
+  (async () => { await cargar(); render(); })();
 </script>
 </body>
 </html>
