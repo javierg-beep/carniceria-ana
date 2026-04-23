@@ -5,128 +5,182 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Carnicería Ana · Pedidos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --verde:       #2d6a1f;
-      --verde-claro: #4a9a32;
-      --verde-bg:    #edf7e8;
-      --crema:       #f7f3ec;
-      --crema2:      #ede7dc;
-      --marron:      #5c3d1e;
-      --marron-claro:#8b6340;
-      --rojo:        #8b1a1a;
-      --rojo-bg:     #fdf0f0;
-      --azul-bg:     #eef4fc;
-      --azul:        #1a4f8b;
-      --ambar-bg:    #fdf6e3;
-      --ambar:       #8b6200;
-      --gris:        #6b6560;
-      --gris-bg:     #f0ede8;
-      --borde:       #d8d0c4;
-      --sombra:      0 2px 12px rgba(0,0,0,0.08);
+      --bg:       #f2ede6;
+      --surface:  #ffffff;
+      --surface2: #f7f3ee;
+      --surface3: #ede8e0;
+      --borde:    #ddd6cc;
+      --text:     #1e1610;
+      --text2:    #6b5f52;
+      --text3:    #a89e93;
+      --verde:    #61a60e;
+      --verde-d:  #4d8a0b;
+      --verde-bg: rgba(97,166,14,0.12);
+      --ambar:    #c07800;
+      --ambar-bg: rgba(192,120,0,0.1);
+      --azul:     #1a56a0;
+      --azul-bg:  rgba(26,86,160,0.1);
+      --gris-bg:  rgba(100,90,80,0.08);
+      --rojo:     #b52020;
+      --rojo-bg:  rgba(181,32,32,0.09);
+      --marron:   #5c3d1e;
+      --r:        14px;
+      --r-sm:     8px;
     }
- 
     * { box-sizing: border-box; margin: 0; padding: 0; }
- 
     body {
-      font-family: 'Lato', sans-serif;
-      background: var(--crema);
-      color: #2a2017;
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
     }
- 
-    /* ── CABECERA ── */
+
+    /* ── HEADER ── */
     header {
-      background: var(--marron);
+      background: #290101;
       padding: 0 24px;
+      height: 60px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 60px;
       position: sticky;
       top: 0;
       z-index: 100;
     }
-    .header-brand {
+    .header-brand { display: flex; align-items: center; gap: 14px; }
+    .header-logo {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      object-fit: contain;
+      background: #fff;
+      padding: 2px;
+      outline: 2px solid #ffffffdb;
+      outline-offset: 2px;
+      flex-shrink: 0;
+    }
+    .header-title {
+      font-family: 'Quicksand', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1;
+    }
+    .header-sub {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: hsl(0, 86%, 47%);
+      margin-top: 3px;
+    }
+    .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+    .header-date { color: #888; font-size: 12px; font-weight: 600; }
+    .header-badge {
+      background: #61a60e;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 5px 14px 5px 10px;
+      border-radius: 50px;
+      letter-spacing: 0.04em;
+      border: 1.5px solid rgba(255,255,255,0.2);
+      cursor: default;
+      transition: transform 0.15s;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
     }
-    .header-icon {
-      width: 34px; height: 34px;
-      background: var(--crema);
+    .header-badge:hover { transform: scale(1.05); }
+    .live-dot {
+      position: relative;
+      width: 9px;
+      height: 9px;
+      flex-shrink: 0;
+    }
+    .live-dot::before,
+    .live-dot::after {
+      content: '';
+      position: absolute;
+      inset: 0;
       border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
+      background: #fff;
     }
-    .header-icon svg { width: 18px; height: 18px; }
-    .header-title {
-      font-family: 'Cinzel', serif;
-      color: #f5ead8;
-      font-size: 16px;
-      letter-spacing: 0.05em;
+    .live-dot::after {
+      background: rgba(255,255,255,0.5);
+      animation: live-pulse 1.6s ease-out infinite;
     }
-    .header-title span {
-      color: var(--crema2);
-      font-size: 11px;
-      font-weight: 700;
-      font-family: 'Lato', sans-serif;
-      letter-spacing: 0.12em;
-      display: block;
-      margin-top: 1px;
-      text-transform: uppercase;
+    @keyframes live-pulse {
+      0%   { transform: scale(1);   opacity: 0.8; }
+      70%  { transform: scale(2.6); opacity: 0; }
+      100% { transform: scale(2.6); opacity: 0; }
     }
-    .header-date {
-      color: #c4b49a;
-      font-size: 13px;
-      font-weight: 300;
-    }
- 
+
     /* ── LAYOUT ── */
-    main { max-width: 1100px; margin: 0 auto; padding: 24px 20px 60px; }
- 
+    main { max-width: 1200px; margin: 0 auto; padding: 20px 16px 60px; }
+
     /* ── STATS ── */
     .stats {
       display: grid;
       grid-template-columns: repeat(4, minmax(0,1fr));
       gap: 12px;
-      margin-bottom: 24px;
-    }
-    .stat {
-      background: #fff;
-      border: 1px solid var(--borde);
-      border-radius: 12px;
-      padding: 16px 18px;
-      position: relative;
-      overflow: hidden;
-    }
-    .stat::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-    }
-    .stat.s-total::before  { background: var(--marron-claro); }
-    .stat.s-pend::before   { background: var(--ambar); }
-    .stat.s-listo::before  { background: var(--verde-claro); }
-    .stat.s-entre::before  { background: var(--gris); }
-    .stat-lbl { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gris); margin-bottom: 6px; }
-    .stat-num { font-size: 32px; font-weight: 700; color: #2a2017; line-height: 1; }
-    .stat-sub { font-size: 11px; color: var(--gris); margin-top: 4px; }
- 
-    /* ── FORMULARIO ── */
-    .form-card {
-      background: #fff;
-      border: 1px solid var(--borde);
-      border-radius: 12px;
-      padding: 20px 22px;
       margin-bottom: 20px;
     }
+    .stat {
+      border-radius: var(--r);
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: transform 0.15s, filter 0.15s;
+      border: 1.5px solid transparent;
+    }
+    .stat:hover { transform: translateY(-2px); filter: brightness(1.1); }
+    .stat.active { border-color: currentColor; }
+    .stat-icon-wrap {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .stat-info { flex: 1; min-width: 0; }
+    .stat-num { font-size: 30px; font-weight: 900; line-height: 1; }
+    .stat-lbl { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; opacity: 0.75; }
+
+    .stat.s-total  { background: #fff3e8; color: #7a4a10; border-color: #f0d0b0; }
+    .stat.s-total .stat-icon-wrap { background: rgba(180,100,20,0.1); }
+    .stat.s-total .stat-num { color: #8b4e10; }
+
+    .stat.s-pend   { background: #fff0f0; color: #b52020; border-color: #f0a0a0; }
+    .stat.s-pend .stat-icon-wrap { background: rgba(181,32,32,0.1); }
+    .stat.s-pend .stat-num { color: #b52020; }
+
+    .stat.s-listo  { background: #eef7e6; color: #4a7d09; border-color: #b8d88a; }
+    .stat.s-listo .stat-icon-wrap { background: rgba(97,166,14,0.12); }
+    .stat.s-listo .stat-num { color: #4d8a0b; }
+
+    .stat.s-entre  { background: #f5f2ee; color: var(--text2); border-color: var(--borde); }
+    .stat.s-entre .stat-icon-wrap { background: var(--gris-bg); }
+    .stat.s-entre .stat-num { color: var(--text); }
+
+    /* ── FORMULARIO ── */
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--borde);
+      border-radius: var(--r);
+      padding: 18px 20px;
+      margin-bottom: 18px;
+    }
     .form-card-title {
-      font-family: 'Cinzel', serif;
-      font-size: 13px;
-      color: var(--marron);
-      letter-spacing: 0.08em;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #61a60e;
       margin-bottom: 14px;
       display: flex;
       align-items: center;
@@ -135,49 +189,78 @@
     .form-card-title::before {
       content: '';
       display: inline-block;
-      width: 3px; height: 14px;
-      background: var(--verde-claro);
+      width: 3px; height: 13px;
+      background: #61a60e;
       border-radius: 2px;
     }
     .form-grid {
       display: grid;
-      grid-template-columns: 1.2fr 0.7fr 0.7fr 2fr 1fr auto;
+      grid-template-columns: 1.3fr 0.75fr 0.75fr 1fr;
       gap: 10px;
-      align-items: end;
+      align-items: start;
     }
-    .fg { display: flex; flex-direction: column; gap: 4px; }
-    .fg label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gris); }
+    .fg { display: flex; flex-direction: column; gap: 5px; }
+    .fg label {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
     .fg input, .fg select {
-      height: 38px;
+      height: 40px;
+      background: var(--surface2);
       border: 1px solid var(--borde);
-      border-radius: 8px;
+      border-radius: var(--r-sm);
       padding: 0 12px;
-      font-family: 'Lato', sans-serif;
-      font-size: 13.5px;
-      color: #2a2017;
-      background: var(--crema);
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      color: var(--text);
       outline: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .fg input::placeholder { color: var(--text3); }
+    .fg input:focus, .fg select:focus {
+      border-color: #61a60e;
+      background: var(--surface3);
+    }
+    .fg select option { background: var(--surface2); }
+    .fg textarea {
+      background: var(--surface2);
+      border: 1px solid var(--borde);
+      border-radius: var(--r-sm);
+      padding: 10px 12px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      color: var(--text);
+      outline: none;
+      resize: vertical;
+      min-height: 76px;
+      line-height: 1.5;
       transition: border-color 0.15s;
     }
-    .fg input:focus, .fg select:focus { border-color: var(--verde-claro); background: #fff; }
+    .fg textarea::placeholder { color: var(--text3); }
+    .fg textarea:focus { border-color: #61a60e; background: var(--surface3); }
+    .fg-full { grid-column: 1 / -1; }
+    .form-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 10px; align-items: center; }
+    .form-hint { font-size: 11px; color: var(--text3); }
     .btn-add {
-      height: 38px;
-      background: var(--verde);
+      height: 42px;
+      background: #61a60e;
       color: #fff;
       border: none;
-      border-radius: 8px;
-      padding: 0 20px;
-      font-family: 'Lato', sans-serif;
+      border-radius: var(--r-sm);
+      padding: 0 24px;
+      font-family: 'Nunito', sans-serif;
       font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
+      font-weight: 900;
+      letter-spacing: 0.04em;
       cursor: pointer;
       transition: background 0.15s, transform 0.1s;
-      white-space: nowrap;
     }
-    .btn-add:hover { background: var(--verde-claro); }
+    .btn-add:hover { background: #4d8a0b; }
     .btn-add:active { transform: scale(0.97); }
- 
+
     /* ── TOOLBAR ── */
     .toolbar {
       display: flex;
@@ -189,41 +272,46 @@
     }
     .filters { display: flex; gap: 6px; flex-wrap: wrap; }
     .f-btn {
-      background: #fff;
+      background: var(--surface2);
       border: 1px solid var(--borde);
-      border-radius: 20px;
-      padding: 5px 14px;
-      font-family: 'Lato', sans-serif;
+      border-radius: 50px;
+      padding: 6px 16px;
+      font-family: 'Nunito', sans-serif;
       font-size: 12px;
       font-weight: 700;
-      letter-spacing: 0.05em;
-      color: var(--gris);
+      color: var(--text2);
       cursor: pointer;
       transition: all 0.15s;
     }
-    .f-btn:hover { border-color: var(--marron-claro); color: var(--marron); }
-    .f-btn.on { background: var(--marron); color: #f5ead8; border-color: var(--marron); }
-    .actions { display: flex; gap: 8px; }
+    .f-btn:hover { border-color: #61a60e; color: #61a60e; }
+    .f-btn.on { background: #61a60e; color: #fff; border-color: #61a60e; }
+
+    /* Hover diferenciado por filtro — colores alineados con las secciones de stats */
+    .f-btn.fb-todos:hover      { border-color: #c08840; color: #8b4e10; }
+    .f-btn.fb-pendiente:hover  { border-color: #c04040; color: #b52020; }
+    .f-btn.fb-preparando:hover { border-color: #3070c0; color: #1244a0; }
+    .f-btn.fb-listo:hover      { border-color: #61a60e; color: #3a6608; }
+    .f-btn.fb-entregado:hover  { border-color: #9a9088; color: #6b5f52; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
     .btn-sec {
-      background: #fff;
+      background: var(--surface2);
       border: 1px solid var(--borde);
-      border-radius: 8px;
-      padding: 6px 14px;
-      font-family: 'Lato', sans-serif;
+      border-radius: var(--r-sm);
+      padding: 7px 14px;
+      font-family: 'Nunito', sans-serif;
       font-size: 12px;
       font-weight: 700;
-      letter-spacing: 0.05em;
-      color: var(--gris);
+      color: var(--text2);
       cursor: pointer;
       transition: all 0.15s;
     }
-    .btn-sec:hover { background: var(--crema2); color: #2a2017; }
- 
-    /* ── TABLA ── */
+    .btn-sec:hover { background: var(--surface3); color: var(--text); border-color: #555; }
+
+    /* ── TABLA / TARJETAS ── */
     .tbl-card {
-      background: #fff;
+      background: var(--surface);
       border: 1px solid var(--borde);
-      border-radius: 12px;
+      border-radius: var(--r);
       overflow: hidden;
     }
     .tbl-wrap { overflow-x: auto; }
@@ -233,210 +321,259 @@
       font-size: 13.5px;
       table-layout: fixed;
     }
-    thead { background: var(--crema); }
+    thead { background: var(--surface2); }
     th {
       text-align: left;
-      padding: 11px 14px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
+      padding: 10px 14px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--marron-claro);
+      color: var(--text3);
       border-bottom: 1px solid var(--borde);
       white-space: nowrap;
     }
     td {
-      padding: 12px 14px;
-      border-bottom: 1px solid #f0ece6;
-      color: #2a2017;
+      padding: 13px 14px;
+      border-bottom: 1px solid #1f1f1f;
+      color: var(--text);
       vertical-align: middle;
     }
     tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #faf7f2; }
-    tr.entregado td { opacity: 0.5; }
- 
-    .td-cliente { font-weight: 700; }
-    .td-hora { font-family: 'Lato', sans-serif; font-weight: 700; color: var(--marron); }
-    .td-detalle { color: #5a4f43; font-size: 13px; }
- 
+    tr:hover td { background: #f7f3ee; cursor: pointer; }
+    tr.entregado td { opacity: 0.38; }
+    .td-cliente { font-weight: 800; font-size: 14px; }
+    .td-hora { font-weight: 700; color: var(--ambar); font-size: 13px; }
+    .td-detalle { color: var(--text2); font-size: 13px; }
+
     /* badges categoría */
     .cat {
       display: inline-block;
-      border-radius: 5px;
+      border-radius: 6px;
       padding: 3px 9px;
       font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
+      font-weight: 800;
+      letter-spacing: 0.04em;
       white-space: nowrap;
     }
-    .cat-carne   { background: #fdf0ec; color: var(--rojo); }
-    .cat-bandeja { background: #eef0fd; color: #1a2a8b; }
-    .cat-super   { background: var(--verde-bg); color: var(--verde); }
-    .cat-encargo { background: var(--ambar-bg); color: var(--ambar); }
- 
+    .cat-carne    { background: #fde8e8; color: #9a1010; }
+    .cat-super    { background: #edf7d8; color: #3a6608; }
+    .cat-bandeja  { background: #ddeeff; color: var(--azul); }
+    .cat-bar      { background: #fef3d8; color: #9a6000; }
+    .cat-completo { background: #f0e8ff; color: #6020a0; }
+
     /* badges estado */
     .estado {
-      display: inline-block;
-      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border-radius: 50px;
       padding: 4px 12px;
       font-size: 11px;
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: 0.04em;
       cursor: pointer;
-      transition: filter 0.15s, transform 0.1s;
+      transition: filter 0.15s, transform 0.12s;
       white-space: nowrap;
       user-select: none;
+      border: 1.5px solid transparent;
     }
-    .estado:hover { filter: brightness(0.92); transform: scale(1.04); }
-    .estado-pendiente  { background: var(--ambar-bg);  color: var(--ambar); border: 1px solid #e8d08a; }
-    .estado-preparando { background: var(--azul-bg);   color: var(--azul);  border: 1px solid #a8c4e8; }
-    .estado-listo      { background: var(--verde-bg);  color: var(--verde); border: 1px solid #9dd47e; }
-    .estado-entregado  { background: var(--gris-bg);   color: var(--gris);  border: 1px solid #ccc6be; }
- 
+    .estado::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+    .estado:hover { filter: brightness(1.2); transform: scale(1.05); }
+    .estado-pendiente  { background: #fde8e8; color: #9a1010; border-color: #e09090; }
+    .estado-preparando { background: #deeeff; color: #1244a0; border-color: #90bef0; }
+    .estado-listo      { background: #e8f5d0; color: #3a6608; border-color: #9acc60; }
+    .estado-entregado  { background: #edeae6; color: #7a6e64; border-color: #ccc4bc; }
+
+    /* campo notas inline */
     .td-nota input {
       width: 100%;
       border: 1px solid transparent;
       border-radius: 6px;
-      padding: 4px 8px;
-      font-family: 'Lato', sans-serif;
+      padding: 5px 8px;
+      font-family: 'Nunito', sans-serif;
       font-size: 12px;
-      color: #5a4f43;
+      color: var(--text2);
       background: transparent;
       outline: none;
       transition: border-color 0.15s, background 0.15s;
     }
-    .td-nota input:focus { border-color: var(--borde); background: var(--crema); }
-    .td-nota input::placeholder { color: #bbb; }
- 
+    .td-nota input:focus { border-color: var(--borde); background: var(--surface2); color: var(--text); }
+    .td-nota input::placeholder { color: var(--text3); }
+
     .btn-del {
       background: none;
       border: none;
-      color: #ccc;
+      color: var(--text3);
       font-size: 18px;
       cursor: pointer;
-      line-height: 1;
-      padding: 2px 6px;
+      padding: 3px 7px;
       border-radius: 6px;
       transition: color 0.15s, background 0.15s;
+      line-height: 1;
     }
     .btn-del:hover { color: var(--rojo); background: var(--rojo-bg); }
- 
+
     .empty {
       text-align: center;
-      padding: 48px 20px;
-      color: var(--gris);
+      padding: 52px 20px;
+      color: var(--text3);
       font-size: 14px;
     }
-    .empty strong { display: block; font-size: 18px; margin-bottom: 6px; color: var(--crema2); }
- 
-    /* ── FECHA RECOGIDA ── */
-    .fecha-hoy     { color: var(--verde);  font-weight: 700; }
-    .fecha-futura  { color: var(--azul);   font-weight: 700; }
-    .fecha-pasada  { color: var(--rojo);   font-weight: 700; }
+    .empty-icon { font-size: 36px; display: block; margin-bottom: 12px; }
+
+    /* ── FECHAS ── */
     .fecha-badge {
       display: inline-block;
       font-size: 11px;
-      padding: 2px 7px;
-      border-radius: 5px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
       white-space: nowrap;
     }
-    .fecha-badge.hoy    { background: var(--verde-bg); color: var(--verde); }
-    .fecha-badge.futura { background: var(--azul-bg);  color: var(--azul);  }
-    .fecha-badge.pasada { background: var(--rojo-bg);  color: var(--rojo);  }
- 
+    .fecha-badge.hoy    { background: #e8f5d0; color: #3a6608; }
+    .fecha-badge.futura { background: #ddeeff; color: #1244a0; }
+    .fecha-badge.pasada { background: #fde8e8; color: #9a1010; }
+
     /* ── TOAST ── */
     #toast {
       position: fixed;
       bottom: 24px; left: 50%;
       transform: translateX(-50%) translateY(80px);
-      background: var(--marron);
+      background: #1e1610;
       color: #f5ead8;
-      padding: 10px 22px;
-      border-radius: 8px;
+      border: 1px solid #3a2e22;
+      padding: 11px 24px;
+      border-radius: 50px;
       font-size: 13px;
       font-weight: 700;
-      letter-spacing: 0.04em;
       transition: transform 0.3s ease;
       z-index: 999;
       pointer-events: none;
     }
     #toast.show { transform: translateX(-50%) translateY(0); }
- 
-    /* ── FOOTER INFO ── */
+
+    /* ── FOOTER TIP ── */
     .footer-tip {
-      margin-top: 28px;
-      background: var(--ambar-bg);
-      border: 1px solid #e8d08a;
-      border-radius: 10px;
-      padding: 14px 18px;
-      font-size: 13px;
-      color: var(--ambar);
+      margin-top: 24px;
+      background: #fff8e8;
+      border: 1px solid #e8d090;
+      border-radius: var(--r);
+      padding: 13px 16px;
+      font-size: 12px;
+      color: #8b6a20;
       display: flex;
       align-items: flex-start;
       gap: 10px;
     }
-    .footer-tip svg { flex-shrink: 0; margin-top: 1px; }
- 
+    .footer-tip svg { flex-shrink: 0; margin-top: 1px; stroke: #8b6a20; }
+    .footer-tip strong { color: #5c4010; }
+
+    /* ── PANEL DETALLE ── */
+    #detalle-panel {
+      background: #ffffff !important;
+    }
+    #detalle-panel .det-header {
+      background: #0a0a0a;
+      border-bottom: 2px solid #61a60e;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    #detalle-panel .det-title {
+      font-family: 'Quicksand', sans-serif;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    #detalle-panel .det-close {
+      background: none;
+      border: none;
+      color: var(--text2);
+      font-size: 22px;
+      cursor: pointer;
+      padding: 0 4px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    #detalle-panel .det-close:hover { color: var(--text); }
+
     /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
+    @media (max-width: 900px) {
       .stats { grid-template-columns: repeat(2, 1fr); }
+      th:nth-child(6), td:nth-child(6) { display: none; }
+    }
+    @media (max-width: 768px) {
       .form-grid { grid-template-columns: 1fr 1fr; }
       .form-grid .fg:nth-child(4) { grid-column: 1 / -1; }
       .form-grid .btn-add { grid-column: 1 / -1; height: 44px; }
-      th:nth-child(4), td:nth-child(4),
-      th:nth-child(6), td:nth-child(6) { display: none; }
+      th:nth-child(4), td:nth-child(4) { display: none; }
     }
     @media (max-width: 480px) {
       .stats { grid-template-columns: repeat(2, 1fr); }
       .header-date { display: none; }
+      header { padding: 0 14px; }
+      main { padding: 14px 10px 60px; }
       th:nth-child(3), td:nth-child(3) { display: none; }
     }
   </style>
 </head>
 <body>
- 
+
 <header>
   <div class="header-brand">
-    <div class="header-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#5c3d1e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 3l7 7M17 3l-4 4 4 4-4 4 4 4"/>
-        <path d="M10 10l4 4M3 21l7-7"/>
-      </svg>
-    </div>
-    <div class="header-title">
-      Carnicería Ana
-      <span>Gestión de pedidos</span>
+    <div>
+      <div class="header-title">CARNICERÍA ANA</div>
+      <div class="header-sub">Gestión de pedidos</div>
     </div>
   </div>
-  <div class="header-date" id="header-date"></div>
+  <div class="header-right">
+    <div class="header-badge" id="header-badge"><span class="live-dot"></span><span id="header-badge-text">0 pedidos activos</span></div>
+  </div>
 </header>
- 
+
 <main>
- 
-  <!-- STATS -->
+
+  <!-- STATS (clicables para filtrar) -->
   <div class="stats">
-    <div class="stat s-total">
-      <div class="stat-lbl">Total hoy</div>
-      <div class="stat-num" id="s-total">0</div>
-      <div class="stat-sub">pedidos registrados</div>
+    <div class="stat s-total" onclick="setFiltroStat('todos')" id="stat-total">
+      <div class="stat-icon-wrap">📋</div>
+      <div class="stat-info">
+        <div class="stat-num" id="s-total">0</div>
+        <div class="stat-lbl">Total hoy</div>
+      </div>
     </div>
-    <div class="stat s-pend">
-      <div class="stat-lbl">Pendientes</div>
-      <div class="stat-num" id="s-pend">0</div>
-      <div class="stat-sub">por preparar</div>
+    <div class="stat s-pend" onclick="setFiltroStat('pendiente')" id="stat-pend">
+      <div class="stat-icon-wrap">⏳</div>
+      <div class="stat-info">
+        <div class="stat-num" id="s-pend">0</div>
+        <div class="stat-lbl">Pendientes</div>
+      </div>
     </div>
-    <div class="stat s-listo">
-      <div class="stat-lbl">Listos</div>
-      <div class="stat-num" id="s-listo">0</div>
-      <div class="stat-sub">para recoger</div>
+    <div class="stat s-listo" onclick="setFiltroStat('listo')" id="stat-listo">
+      <div class="stat-icon-wrap">✅</div>
+      <div class="stat-info">
+        <div class="stat-num" id="s-listo">0</div>
+        <div class="stat-lbl">Listos</div>
+      </div>
     </div>
-    <div class="stat s-entre">
-      <div class="stat-lbl">Entregados</div>
-      <div class="stat-num" id="s-entre">0</div>
-      <div class="stat-sub">completados</div>
+    <div class="stat s-entre" onclick="setFiltroStat('entregado')" id="stat-entre">
+      <div class="stat-icon-wrap">📦</div>
+      <div class="stat-info">
+        <div class="stat-num" id="s-entre">0</div>
+        <div class="stat-lbl">Entregados</div>
+      </div>
     </div>
   </div>
- 
+
   <!-- FORMULARIO -->
   <div class="form-card">
     <div class="form-card-title">Nuevo pedido</div>
@@ -454,30 +591,34 @@
         <input type="time" id="f-hora">
       </div>
       <div class="fg">
-        <label>Detalle del pedido</label>
-        <input type="text" id="f-detalle" placeholder="Ej: Entrecot 800g + chuletas cerdo x4">
-      </div>
-      <div class="fg">
         <label>Categoría</label>
         <select id="f-cat">
           <option value="carne">🥩 Carnicería</option>
-          <option value="bandeja">🍽 Bandeja especial</option>
           <option value="super">🛒 Supermercado</option>
-          <option value="encargo">⭐ Encargo especial</option>
+          <option value="bandeja">🎊 Bandejas especiales</option>
+          <option value="bar">🍺 Bares</option>
+          <option value="completo">🛍️ Completo (Carne+Super)</option>
         </select>
       </div>
-      <button class="btn-add" onclick="addPedido()">+ Añadir</button>
+      <div class="fg fg-full">
+        <label>Detalle del pedido</label>
+        <textarea id="f-detalle" placeholder="Piezas, pesos, cortes, preferencias, alergias..."></textarea>
+      </div>
+      <div class="form-actions">
+        <span class="form-hint">Ctrl+Enter para guardar</span>
+        <button class="btn-add" onclick="addPedido()">+ Añadir pedido</button>
+      </div>
     </div>
   </div>
- 
+
   <!-- TOOLBAR -->
   <div class="toolbar">
     <div class="filters" id="filtros">
-      <button class="f-btn on" onclick="setFiltro('todos',this)">Todos</button>
-      <button class="f-btn" onclick="setFiltro('pendiente',this)">Pendientes</button>
-      <button class="f-btn" onclick="setFiltro('preparando',this)">Preparando</button>
-      <button class="f-btn" onclick="setFiltro('listo',this)">Listos</button>
-      <button class="f-btn" onclick="setFiltro('entregado',this)">Entregados</button>
+      <button class="f-btn fb-todos on" onclick="setFiltro('todos',this)">Todos</button>
+      <button class="f-btn fb-pendiente" onclick="setFiltro('pendiente',this)">⏳ Pendientes</button>
+      <button class="f-btn fb-preparando" onclick="setFiltro('preparando',this)">⚔️ Preparando</button>
+      <button class="f-btn fb-listo" onclick="setFiltro('listo',this)">✅ Listos</button>
+      <button class="f-btn fb-entregado" onclick="setFiltro('entregado',this)">📦 Entregados</button>
     </div>
     <div class="actions">
       <button class="btn-sec" onclick="limpiarEntregados()">Limpiar entregados</button>
@@ -485,7 +626,7 @@
       <button class="btn-sec" onclick="exportTexto()">Copiar resumen</button>
     </div>
   </div>
- 
+
   <!-- TABLA -->
   <div class="tbl-card">
     <div class="tbl-wrap">
@@ -493,11 +634,11 @@
         <thead>
           <tr>
             <th style="width:14%">Cliente</th>
-            <th style="width:14%">Recogida</th>
-            <th style="width:29%">Pedido</th>
+            <th style="width:13%">Recogida</th>
+            <th style="width:28%">Pedido</th>
             <th style="width:11%">Categoría</th>
-            <th style="width:12%">Estado</th>
-            <th style="width:15%">Notas</th>
+            <th style="width:13%">Estado</th>
+            <th style="width:16%">Notas</th>
             <th style="width:5%"></th>
           </tr>
         </thead>
@@ -505,24 +646,35 @@
       </table>
     </div>
   </div>
- 
+
   <!-- TIP -->
   <div class="footer-tip">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    <span>Haz clic sobre el <strong>estado</strong> de cualquier pedido para avanzarlo: Pendiente → Preparando → Listo → Entregado. Los pedidos se guardan automáticamente en el navegador y se recuperan al reabrir la página.</span>
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span>Clic en una <strong>fila</strong> para ver el detalle · Clic en el <strong>estado</strong> para avanzarlo · Las tarjetas de arriba también filtran la lista</span>
   </div>
- 
+
 </main>
- 
+
+<!-- PANEL DETALLE -->
+<div id="detalle-overlay" onclick="cerrarDetalle()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;backdrop-filter:blur(2px);"></div>
+<div id="detalle-panel" style="display:none;position:fixed;right:0;top:0;bottom:0;width:380px;max-width:95vw;z-index:201;overflow-y:auto;box-shadow:-8px 0 32px rgba(0,0,0,0.6);">
+  <div class="det-header">
+    <span id="detalle-titulo" class="det-title"></span>
+    <button class="det-close" onclick="cerrarDetalle()">&#215;</button>
+  </div>
+  <div id="detalle-body" style="padding:20px;"></div>
+</div>
+
 <div id="toast"></div>
- 
+
 <script>
-  const CAT_LABELS = { carne:'Carnicería', bandeja:'Bandeja', super:'Supermercado', encargo:'Encargo' };
+
+  const CAT_LABELS = { carne:'Carnicería', super:'Supermercado', bandeja:'Bandejas especiales', bar:'Bares', completo:'Completo (Carne+Super)' };
   const ESTADOS = ['pendiente','preparando','listo','entregado'];
   let pedidos = [];
   let nextId = 1;
   let filtro = 'todos';
- 
+
   function guardar() {
     localStorage.setItem('pedidos_ana', JSON.stringify({ pedidos, nextId }));
   }
@@ -534,37 +686,40 @@
     if (!pedidos.length) pedidos = [
       { id:1, cliente:'María García',    fecha: new Date().toISOString().slice(0,10), hora:'10:00', detalle:'Entrecot ternera 800g + chuletas cerdo x4', cat:'carne',   estado:'listo',      notas:'' },
       { id:2, cliente:'Juan Rodríguez',  fecha: new Date().toISOString().slice(0,10), hora:'13:00', detalle:'Bandeja mixta barbacoa 1kg',                cat:'bandeja', estado:'pendiente',  notas:'Sin picante' },
-      { id:3, cliente:'Ana Martínez',    fecha: new Date(Date.now()+86400000).toISOString().slice(0,10), hora:'11:30', detalle:'Pollo entero + costillas cerdo', cat:'encargo', estado:'preparando', notas:'Sábado' },
+      { id:3, cliente:'Ana Martínez',    fecha: new Date(Date.now()+86400000).toISOString().slice(0,10), hora:'11:30', detalle:'Pollo entero + costillas cerdo', cat:'bandeja', estado:'preparando', notas:'Sábado' },
       { id:4, cliente:'Luis Pérez',      fecha: new Date().toISOString().slice(0,10), hora:'09:30', detalle:'Leche, pan, aceite, huevos x12',           cat:'super',   estado:'entregado',  notas:'' }
     ];
     nextId = Math.max(...pedidos.map(p=>p.id)) + 1;
   }
- 
+
   function toast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2200);
   }
- 
+
   function render() {
     const hoy = new Date();
     document.getElementById('header-date').textContent =
       hoy.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
- 
+    const activos = pedidos.filter(p=>p.estado!=='entregado').length;
+    const badge = document.getElementById('header-badge-text');
+    if (badge) badge.textContent = activos === 1 ? '1 pedido activo' : activos + ' pedidos activos';
+
     document.getElementById('s-total').textContent = pedidos.length;
     document.getElementById('s-pend').textContent  = pedidos.filter(p=>p.estado==='pendiente').length;
     document.getElementById('s-listo').textContent = pedidos.filter(p=>p.estado==='listo').length;
     document.getElementById('s-entre').textContent = pedidos.filter(p=>p.estado==='entregado').length;
- 
+
     const vis = filtro === 'todos' ? pedidos : pedidos.filter(p=>p.estado===filtro);
     const body = document.getElementById('tbl-body');
- 
+
     if (!vis.length) {
-      body.innerHTML = `<tr><td colspan="7"><div class="empty"><strong>—</strong>No hay pedidos en este estado</div></td></tr>`;
+      body.innerHTML = `<tr><td colspan="7"><div class="empty"><span class="empty-icon">🔍</span>No hay pedidos en este estado</div></td></tr>`;
       return;
     }
- 
+
     const sorted = [...vis].sort((a,b)=>{
       const ord = {pendiente:0,preparando:1,listo:2,entregado:3};
       if (ord[a.estado] !== ord[b.estado]) return ord[a.estado]-ord[b.estado];
@@ -572,9 +727,9 @@
       const fb = (b.fecha||'9999') + (b.hora||'');
       return fa.localeCompare(fb);
     });
- 
+
     const hoyStr = new Date().toISOString().slice(0,10);
- 
+
     body.innerHTML = sorted.map(p => {
       const f = p.fecha || '';
       let fechaBadge = '';
@@ -588,22 +743,23 @@
       }
       const horaStr = p.hora ? `<span class="td-hora" style="display:block;margin-top:3px;font-size:13px;">${p.hora}</span>` : '';
       const recogidaHtml = (fechaBadge || horaStr) ? `${fechaBadge}${horaStr}` : '—';
- 
+
       return `
-      <tr class="${p.estado==='entregado'?'entregado':''}">
+      <tr class="${p.estado==='entregado'?'entregado':''}" style="cursor:pointer;" onclick="abrirDetalle(${p.id},event)">
         <td class="td-cliente">${esc(p.cliente)}</td>
         <td style="white-space:nowrap;">${recogidaHtml}</td>
         <td class="td-detalle">${esc(p.detalle)}</td>
-        <td><span class="cat cat-${p.cat}">${CAT_LABELS[p.cat]}</span></td>
-        <td><span class="estado estado-${p.estado}" onclick="avanzar(${p.id})" title="Clic para cambiar estado">${p.estado}</span></td>
-        <td class="td-nota"><input type="text" value="${esc(p.notas)}" placeholder="Notas..." onchange="setNota(${p.id},this.value)"></td>
-        <td><button class="btn-del" onclick="del(${p.id})" title="Eliminar">×</button></td>
+        <td><span class="cat cat-${p.cat}">${cap(CAT_LABELS[p.cat])}</span></td>
+        <td onclick="event.stopPropagation()"><span class="estado estado-${p.estado}" onclick="avanzar(${p.id})" title="Clic para cambiar estado">${cap(p.estado)}</span></td>
+        <td class="td-nota" onclick="event.stopPropagation()"><input type="text" value="${esc(p.notas)}" placeholder="Notas..." onchange="setNota(${p.id},this.value)"></td>
+        <td onclick="event.stopPropagation()"><button class="btn-del" onclick="del(${p.id})" title="Eliminar">×</button></td>
       </tr>`;
     }).join('');
   }
- 
+
+  function cap(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
   function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
- 
+
   function addPedido() {
     const cliente = document.getElementById('f-cliente').value.trim();
     const detalle = document.getElementById('f-detalle').value.trim();
@@ -632,7 +788,7 @@
     const _cuando = [_fd, _fh].filter(Boolean).join(' · ');
     toast('Pedido añadido' + (_cuando ? '  ·  ' + _cuando : ''));
   }
- 
+
   function avanzar(id) {
     const p = pedidos.find(x=>x.id===id);
     if (!p) return;
@@ -642,12 +798,12 @@
     const labels = {pendiente:'Pendiente',preparando:'Preparando',listo:'Listo ✓',entregado:'Entregado'};
     toast(p.cliente + ' → ' + labels[next]);
   }
- 
+
   function setNota(id, val) {
     const p = pedidos.find(x=>x.id===id);
     if (p) { p.notas = val; guardar(); }
   }
- 
+
   function del(id) {
     const p = pedidos.find(x=>x.id===id);
     if (p && confirm('¿Eliminar el pedido de ' + p.cliente + '?')) {
@@ -655,7 +811,7 @@
       guardar(); render();
     }
   }
- 
+
   function limpiarEntregados() {
     const n = pedidos.filter(p=>p.estado==='entregado').length;
     if (!n) { toast('No hay entregados'); return; }
@@ -665,7 +821,7 @@
       toast(n + ' pedido(s) eliminados');
     }
   }
- 
+
   function exportCSV() {
     const hoy = new Date().toISOString().slice(0,10);
     const header = 'Cliente,Fecha recogida,Hora,Pedido,Categoría,Estado,Notas';
@@ -679,7 +835,7 @@
     a.click();
     toast('CSV exportado');
   }
- 
+
   function exportTexto() {
     const hoy = new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
     const activos = pedidos.filter(p=>p.estado!=='entregado');
@@ -691,20 +847,113 @@
       }).join('\n\n');
     navigator.clipboard.writeText(txt).then(() => toast('Resumen copiado al portapapeles'));
   }
- 
+
   function setFiltro(f, btn) {
     filtro = f;
     document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('on'));
     btn.classList.add('on');
     render();
   }
- 
+
   document.getElementById('f-detalle').addEventListener('keydown', e => {
-    if (e.key === 'Enter') addPedido();
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) addPedido();
   });
- 
+
   document.getElementById('f-fecha').value = new Date().toISOString().slice(0,10);
- 
+
+  function abrirDetalle(id, e) {
+    const p = pedidos.find(x=>x.id===id);
+    if (!p) return;
+    const hoyStr = new Date().toISOString().slice(0,10);
+    const f = p.fecha || '';
+    let fechaLabel = '—';
+    if (f) {
+      const d = new Date(f+'T00:00:00');
+      fechaLabel = d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    }
+    const estadoColors = {
+      pendiente:['#fde8e8','#9a1010'],
+      preparando:['#deeeff','#1244a0'],
+      listo:['#e8f5d0','#3a6608'],
+      entregado:['#edeae6','#7a6e64']
+    };
+    const [bg, col] = estadoColors[p.estado] || ['#eee','#333'];
+
+    document.getElementById('detalle-titulo').textContent = p.cliente;
+    document.getElementById('detalle-body').innerHTML = `
+      <div style="margin-bottom:20px;">
+        <div style="display:inline-block;background:${bg};color:${col};border-radius:24px;padding:5px 16px;font-size:13px;font-weight:700;letter-spacing:0.04em;margin-bottom:16px;">${p.estado.toUpperCase()}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+          <div style="background:#f5f1ec;border-radius:10px;padding:12px 14px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#a89e93;text-transform:uppercase;margin-bottom:4px;">Fecha</div>
+            <div style="font-size:14px;color:#2a2017;">${fechaLabel}</div>
+          </div>
+          <div style="background:#f5f1ec;border-radius:10px;padding:12px 14px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#a89e93;text-transform:uppercase;margin-bottom:4px;">Hora</div>
+            <div style="font-size:20px;font-weight:700;color:#5c3d1e;">${p.hora||'—'}</div>
+          </div>
+        </div>
+        <div style="background:#f5f1ec;border-radius:10px;padding:14px;margin-bottom:12px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#a89e93;text-transform:uppercase;margin-bottom:8px;">Pedido</div>
+          <div style="font-size:14px;color:#2a2017;line-height:1.6;white-space:pre-wrap;">${esc(p.detalle)}</div>
+        </div>
+        ${p.notas ? `<div style="background:#fff8e8;border:1px solid #e8d090;border-radius:10px;padding:14px;margin-bottom:12px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#8b6200;text-transform:uppercase;margin-bottom:6px;">Notas</div>
+          <div style="font-size:14px;color:#6b4f2a;">${esc(p.notas)}</div>
+        </div>` : ''}
+        <div style="background:#f5f1ec;border-radius:10px;padding:12px 14px;margin-bottom:20px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#a89e93;text-transform:uppercase;margin-bottom:4px;">Categoría</div>
+          <div style="font-size:14px;color:#2a2017;">${cap(CAT_LABELS[p.cat])}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#8b6340;text-transform:uppercase;margin-bottom:2px;">Cambiar estado</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            ${['pendiente','preparando','listo','entregado'].map(s=>`
+              <button onclick="cambiarEstadoDetalle(${p.id},'${s}')" style="flex:1;min-width:80px;padding:8px 6px;border-radius:12px;border:2px solid ${s===p.estado?col:'#ddd6cc'};background:${s===p.estado?bg:'#f7f3ee'};color:${s===p.estado?col:'#a89e93'};font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;">${s}</button>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+    document.getElementById('detalle-overlay').style.display = 'block';
+    document.getElementById('detalle-panel').style.display = 'block';
+  }
+
+  function cambiarEstadoDetalle(id, nuevoEstado) {
+    const p = pedidos.find(x=>x.id===id);
+    if (!p) return;
+    p.estado = nuevoEstado;
+    guardar(); render();
+    abrirDetalle(id, null);
+    toast(p.cliente + ' → ' + nuevoEstado);
+  }
+
+  function cerrarDetalle() {
+    document.getElementById('detalle-overlay').style.display = 'none';
+    document.getElementById('detalle-panel').style.display = 'none';
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarDetalle(); });
+
+  cargar(); render();
+
+
+  function setFiltroStat(f) {
+    const map = { todos:'stat-total', pendiente:'stat-pend', listo:'stat-listo', entregado:'stat-entre' };
+    filtro = f;
+    document.querySelectorAll('.stat').forEach(s => s.classList.remove('active'));
+    if (map[f]) document.getElementById(map[f]).classList.add('active');
+    document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('on'));
+    const btns = document.querySelectorAll('.f-btn');
+    btns.forEach(b => { if (b.textContent.toLowerCase().includes(f === 'todos' ? 'todos' : f.slice(0,4))) b.classList.add('on'); });
+    render();
+  }
+
+  document.getElementById('f-detalle').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) addPedido();
+  });
+  document.getElementById('f-fecha').value = new Date().toISOString().slice(0,10);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarDetalle(); });
   cargar(); render();
 </script>
 </body>
