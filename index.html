@@ -700,14 +700,24 @@
       db = getFirestore(app);
       pedidosColRef = collection(db, 'pedidos');
 
-      // Escucha cambios en tiempo real → re-renderiza automáticamente
-      onSnapshot(pedidosColRef, function(snapshot) {
-        pedidos = snapshot.docs.map(function(d) { return d.data(); });
-        pedidos.sort(function(a,b) { return a.id - b.id; });
-        nextId = pedidos.length ? Math.max.apply(null, pedidos.map(function(p){ return p.id; })) + 1 : 1;
-        render();
+      // Espera el primer snapshot antes de continuar
+      return new Promise(function(resolve) {
+        var firstLoad = true;
+        onSnapshot(pedidosColRef, function(snapshot) {
+          pedidos = snapshot.docs.map(function(d) { return d.data(); });
+          pedidos.sort(function(a,b) { return a.id - b.id; });
+          nextId = pedidos.length ? Math.max.apply(null, pedidos.map(function(p){ return p.id; })) + 1 : 1;
+          if (firstLoad) {
+            firstLoad = false;
+            resolve(true);  // primer load: deja que cargar() llame a render()
+          } else {
+            render();  // cambios posteriores en tiempo real
+          }
+        }, function(err) {
+          console.error('Firestore snapshot error:', err);
+          resolve(false);
+        });
       });
-      return true;
     } catch(e) {
       console.error('Firestore error:', e);
       return false;
@@ -736,8 +746,10 @@
   }
 
   async function cargar() {
+    mostrarCargando(true);
     await initFirestore();
-    // onSnapshot ya carga los datos y llama a render()
+    mostrarCargando(false);
+    render();
   }
 
   // ── UTILS ─────────────────────────────────────────────────────────────
@@ -750,6 +762,14 @@
     t.textContent = msg;
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  // ── CARGANDO ──────────────────────────────────────────────────────────
+  function mostrarCargando(show) {
+    var el = document.getElementById('loading-msg');
+    if (el) el.style.display = show ? 'block' : 'none';
+    var tbl = document.getElementById('tbl-body');
+    if (show && tbl) tbl.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#a89e93;font-size:14px;">⏳ Cargando pedidos...</td></tr>';
   }
 
   // ── RENDER ────────────────────────────────────────────────────────────
