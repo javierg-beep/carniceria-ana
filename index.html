@@ -159,13 +159,13 @@
     .stat.s-pend .stat-icon-wrap { background: rgba(181,32,32,0.1); }
     .stat.s-pend .stat-num { color: #b52020; }
 
-    .stat.s-listo  { background: #eef7e6; color: #4a7d09; border-color: #b8d88a; }
-    .stat.s-listo .stat-icon-wrap { background: rgba(97,166,14,0.12); }
-    .stat.s-listo .stat-num { color: #4d8a0b; }
+    .stat.s-listo  { background: #fff3e0; color: #b85c00; border-color: #f0b870; }
+    .stat.s-listo .stat-icon-wrap { background: rgba(200,100,0,0.12); }
+    .stat.s-listo .stat-num { color: #b85c00; }
 
-    .stat.s-entre  { background: #f5f2ee; color: var(--text2); border-color: var(--borde); }
-    .stat.s-entre .stat-icon-wrap { background: var(--gris-bg); }
-    .stat.s-entre .stat-num { color: var(--text); }
+    .stat.s-entre  { background: #eef7e6; color: #4a7d09; border-color: #b8d88a; }
+    .stat.s-entre .stat-icon-wrap { background: rgba(97,166,14,0.12); }
+    .stat.s-entre .stat-num { color: #4d8a0b; }
 
     /* ── FORMULARIO ── */
     .form-card {
@@ -793,14 +793,14 @@
       </div>
     </div>
     <div class="stat s-listo" onclick="setFiltroStat('listo')" id="stat-listo">
-      <div class="stat-icon-wrap">✅</div>
+      <div class="stat-icon-wrap">📦</div>
       <div class="stat-info">
         <div class="stat-num" id="s-listo">0</div>
         <div class="stat-lbl">Listos</div>
       </div>
     </div>
     <div class="stat s-entre" onclick="setFiltroStat('entregado')" id="stat-entre">
-      <div class="stat-icon-wrap">📦</div>
+      <div class="stat-icon-wrap">✅</div>
       <div class="stat-info">
         <div class="stat-num" id="s-entre">0</div>
         <div class="stat-lbl">Entregados</div>
@@ -960,6 +960,7 @@
 <script>
   const CAT_LABELS = { carne:'Carnicería', super:'Supermercado', bandeja:'Bandejas especiales', bar:'Bares', completo:'Completo (Carne+Super)' };
   const ESTADOS    = ['pendiente','preparando','listo','entregado'];
+  const ESTADO_LABELS = { pendiente:'Pendiente', preparando:'Preparando', listo:'Listo', entregado:'Entregado' };
   let pedidos = [];
   let nextId  = 1;
   let filtro  = 'todos';
@@ -1153,8 +1154,7 @@
     var next = ESTADOS[(ESTADOS.indexOf(p.estado) + 1) % ESTADOS.length];
     p.estado = next;
     render(); guardar();
-    var labels = { pendiente:'Pendiente', preparando:'Preparando', listo:'Listo ✓', entregado:'Entregado' };
-    toast(p.cliente + ' → ' + labels[next]);
+    toast(p.cliente + ' → ' + (ESTADO_LABELS[next] || cap(next)));
   }
 
   function setNota(id, val) {
@@ -1274,7 +1274,7 @@
         + '<div style="font-size:11px;font-weight:700;color:#8b6340;text-transform:uppercase;margin-bottom:2px;">Cambiar estado</div>'
         + '<div style="display:flex;gap:8px;flex-wrap:wrap;">'
         + ESTADOS.map(function(s) {
-            return '<button onclick="cambiarEstadoDetalle(' + p.id + ',\'' + s + '\')" style="flex:1;min-width:80px;padding:8px 6px;border-radius:12px;border:2px solid ' + (s === p.estado ? col : '#ddd6cc') + ';background:' + (s === p.estado ? bg : '#f7f3ee') + ';color:' + (s === p.estado ? col : '#a89e93') + ';font-size:12px;font-weight:700;cursor:pointer;font-family:\'Nunito\',sans-serif;">' + s + '</button>';
+            return '<button onclick="cambiarEstadoDetalle(' + p.id + ',\'' + s + '\')" style="flex:1;min-width:80px;padding:8px 6px;border-radius:12px;border:2px solid ' + (s === p.estado ? col : '#ddd6cc') + ';background:' + (s === p.estado ? bg : '#f7f3ee') + ';color:' + (s === p.estado ? col : '#a89e93') + ';font-size:12px;font-weight:700;cursor:pointer;font-family:\'Nunito\',sans-serif;">' + (ESTADO_LABELS[s] || cap(s)) + '</button>';
           }).join('')
         + '</div>'
       + '</div>'
@@ -1290,7 +1290,7 @@
     p.estado = nuevoEstado;
     render(); guardar();
     abrirDetalle(id, null);
-    toast(p.cliente + ' → ' + nuevoEstado);
+    toast(p.cliente + ' → ' + (ESTADO_LABELS[nuevoEstado] || cap(nuevoEstado)));
   }
 
   function cerrarDetalle() {
@@ -1336,7 +1336,7 @@
             + horaStr
             + '<span class="cat cat-' + p.cat + '">' + cap(CAT_LABELS[p.cat] || p.cat) + '</span>'
           + '</div>'
-          + '<span class="pedido-card-estado estado-' + p.estado + '" style="background:' + sc[0] + ';color:' + sc[1] + ';border-color:' + sc[2] + ';" onclick="event.stopPropagation();avanzar(' + p.id + ')">' + cap(p.estado) + '</span>'
+          + '<span class="pedido-card-estado estado-' + p.estado + '" style="background:' + sc[0] + ';color:' + sc[1] + ';border-color:' + sc[2] + ';" onclick="event.stopPropagation();avanzar(' + p.id + ')">' + (ESTADO_LABELS[p.estado] || cap(p.estado)) + '</span>'
         + '</div>'
       + '</div>';
     }).join('');
