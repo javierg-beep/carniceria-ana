@@ -195,7 +195,7 @@
     }
     .form-grid {
       display: grid;
-      grid-template-columns: 1.3fr 0.75fr 0.75fr 1fr;
+      grid-template-columns: 1.2fr 0.9fr 0.75fr 0.75fr 1fr;
       gap: 10px;
       align-items: start;
     }
@@ -580,7 +580,11 @@
     <div class="form-grid">
       <div class="fg">
         <label>Cliente</label>
-        <input type="text" id="f-cliente" placeholder="Nombre o teléfono">
+        <input type="text" id="f-cliente" placeholder="Nombre del cliente">
+      </div>
+      <div class="fg">
+        <label>Teléfono</label>
+        <input type="tel" id="f-telefono" placeholder="612 345 678">
       </div>
       <div class="fg">
         <label>Fecha recogida</label>
@@ -633,12 +637,13 @@
       <table>
         <thead>
           <tr>
-            <th style="width:14%">Cliente</th>
-            <th style="width:13%">Recogida</th>
-            <th style="width:28%">Pedido</th>
-            <th style="width:11%">Categoría</th>
-            <th style="width:13%">Estado</th>
-            <th style="width:16%">Notas</th>
+            <th style="width:12%">Cliente</th>
+            <th style="width:10%">Teléfono</th>
+            <th style="width:11%">Recogida</th>
+            <th style="width:22%">Pedido</th>
+            <th style="width:10%">Categoría</th>
+            <th style="width:11%">Estado</th>
+            <th style="width:14%">Notas</th>
             <th style="width:5%"></th>
           </tr>
         </thead>
@@ -668,35 +673,62 @@
 <div id="toast"></div>
 
 <script>
-
   const CAT_LABELS = { carne:'Carnicería', super:'Supermercado', bandeja:'Bandejas especiales', bar:'Bares', completo:'Completo (Carne+Super)' };
-  const ESTADOS = ['pendiente','preparando','listo','entregado'];
+  const ESTADOS    = ['pendiente','preparando','listo','entregado'];
   let pedidos = [];
-  let nextId = 1;
-  let filtro = 'todos';
+  let nextId  = 1;
+  let filtro  = 'todos';
 
-  async function guardar() {
-    try {
-      await window.storage.set('pedidos_ana', JSON.stringify({ pedidos, nextId }));
-    } catch(e) {}
+  // ── STORAGE ───────────────────────────────────────────────────────────
+  const SK = 'pedidos_ana_v2';
+  const useWindowStorage = typeof window.storage !== 'undefined' && typeof window.storage.get === 'function';
+
+  function guardar() {
+    const str = JSON.stringify({ pedidos, nextId });
+    if (useWindowStorage) {
+      try { window.storage.set(SK, str); } catch(e) {}
+    } else {
+      try { localStorage.setItem(SK, str); } catch(e) {}
+    }
   }
+
   async function cargar() {
-    try {
-      const result = await window.storage.get('pedidos_ana');
-      if (result && result.value) {
-        const d = JSON.parse(result.value);
-        if (d) { pedidos = d.pedidos; nextId = d.nextId; }
-      }
-    } catch(e) {}
-    if (!pedidos.length) pedidos = [
-      { id:1, cliente:'María García',    fecha: new Date().toISOString().slice(0,10), hora:'10:00', detalle:'Entrecot ternera 800g + chuletas cerdo x4', cat:'carne',   estado:'listo',      notas:'' },
-      { id:2, cliente:'Juan Rodríguez',  fecha: new Date().toISOString().slice(0,10), hora:'13:00', detalle:'Bandeja mixta barbacoa 1kg',                cat:'bandeja', estado:'pendiente',  notas:'Sin picante' },
-      { id:3, cliente:'Ana Martínez',    fecha: new Date(Date.now()+86400000).toISOString().slice(0,10), hora:'11:30', detalle:'Pollo entero + costillas cerdo', cat:'bandeja', estado:'preparando', notas:'Sábado' },
-      { id:4, cliente:'Luis Pérez',      fecha: new Date().toISOString().slice(0,10), hora:'09:30', detalle:'Leche, pan, aceite, huevos x12',           cat:'super',   estado:'entregado',  notas:'' }
-    ];
-    nextId = Math.max(...pedidos.map(p=>p.id)) + 1;
+    let d = null;
+    if (useWindowStorage) {
+      // Claude artifact context → window.storage
+      try {
+        const r = await window.storage.get(SK);
+        if (r && r.value) d = JSON.parse(r.value);
+      } catch(e) {}
+    } else {
+      // Navegador normal (GitHub Pages, local, etc.) → localStorage
+      try {
+        const raw = localStorage.getItem(SK);
+        if (raw) d = JSON.parse(raw);
+      } catch(e) {}
+    }
+    if (d && Array.isArray(d.pedidos) && d.pedidos.length) {
+      pedidos = d.pedidos;
+      nextId  = d.nextId || (Math.max(...pedidos.map(p => p.id)) + 1);
+    } else {
+      // datos de ejemplo solo la primera vez
+      const hoy   = new Date().toISOString().slice(0, 10);
+      const manana = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+      pedidos = [
+        { id:1, cliente:'María García',   telefono:'611 222 333', fecha:hoy,    hora:'10:00', detalle:'Entrecot ternera 800g + chuletas cerdo x4', cat:'carne',   estado:'listo',      notas:'' },
+        { id:2, cliente:'Juan Rodríguez', telefono:'',             fecha:hoy,    hora:'13:00', detalle:'Bandeja mixta barbacoa 1kg',                cat:'bandeja', estado:'pendiente',  notas:'Sin picante' },
+        { id:3, cliente:'Ana Martínez',   telefono:'699 000 111', fecha:manana, hora:'11:30', detalle:'Pollo entero + costillas cerdo',            cat:'bandeja', estado:'preparando', notas:'Sábado' },
+        { id:4, cliente:'Luis Pérez',     telefono:'',             fecha:hoy,    hora:'09:30', detalle:'Leche, pan, aceite, huevos x12',           cat:'super',   estado:'entregado',  notas:'' }
+      ];
+      nextId = 5;
+    }
   }
 
+  // ── UTILS ─────────────────────────────────────────────────────────────
+  function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+  function esc(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
   function toast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
@@ -704,260 +736,255 @@
     setTimeout(() => t.classList.remove('show'), 2200);
   }
 
+  // ── RENDER ────────────────────────────────────────────────────────────
   function render() {
-    const hoy = new Date();
+    // header
     document.getElementById('header-date').textContent =
-      hoy.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
-    const activos = pedidos.filter(p=>p.estado!=='entregado').length;
+      new Date().toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long' });
+    const activos = pedidos.filter(p => p.estado !== 'entregado').length;
     const badge = document.getElementById('header-badge-text');
     if (badge) badge.textContent = activos === 1 ? '1 pedido activo' : activos + ' pedidos activos';
 
+    // stats
     document.getElementById('s-total').textContent = pedidos.length;
-    document.getElementById('s-pend').textContent  = pedidos.filter(p=>p.estado==='pendiente').length;
-    document.getElementById('s-listo').textContent = pedidos.filter(p=>p.estado==='listo').length;
-    document.getElementById('s-entre').textContent = pedidos.filter(p=>p.estado==='entregado').length;
+    document.getElementById('s-pend').textContent  = pedidos.filter(p => p.estado === 'pendiente').length;
+    document.getElementById('s-listo').textContent = pedidos.filter(p => p.estado === 'listo').length;
+    document.getElementById('s-entre').textContent = pedidos.filter(p => p.estado === 'entregado').length;
 
-    const vis = filtro === 'todos' ? pedidos : pedidos.filter(p=>p.estado===filtro);
+    // tabla
+    const vis  = filtro === 'todos' ? pedidos : pedidos.filter(p => p.estado === filtro);
     const body = document.getElementById('tbl-body');
-
     if (!vis.length) {
-      body.innerHTML = `<tr><td colspan="7"><div class="empty"><span class="empty-icon">🔍</span>No hay pedidos en este estado</div></td></tr>`;
+      body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:#a89e93;">No hay pedidos en este estado</td></tr>';
       return;
     }
 
-    const sorted = [...vis].sort((a,b)=>{
-      const ord = {pendiente:0,preparando:1,listo:2,entregado:3};
-      if (ord[a.estado] !== ord[b.estado]) return ord[a.estado]-ord[b.estado];
-      const fa = (a.fecha||'9999') + (a.hora||'');
-      const fb = (b.fecha||'9999') + (b.hora||'');
-      return fa.localeCompare(fb);
+    const hoyStr = new Date().toISOString().slice(0, 10);
+    const ord = { pendiente:0, preparando:1, listo:2, entregado:3 };
+    const sorted = [...vis].sort((a, b) => {
+      if (ord[a.estado] !== ord[b.estado]) return ord[a.estado] - ord[b.estado];
+      return ((a.fecha||'9999')+(a.hora||'')).localeCompare((b.fecha||'9999')+(b.hora||''));
     });
 
-    const hoyStr = new Date().toISOString().slice(0,10);
-
-    body.innerHTML = sorted.map(p => {
-      const f = p.fecha || '';
-      let fechaBadge = '';
+    body.innerHTML = sorted.map(function(p) {
+      var f = p.fecha || '';
+      var fechaBadge = '';
       if (f) {
-        const d = new Date(f + 'T00:00:00');
-        const label = d.toLocaleDateString('es-ES',{day:'numeric',month:'short'});
-        let cls = 'futura';
-        if (f === hoyStr) cls = 'hoy';
-        else if (f < hoyStr) cls = 'pasada';
-        fechaBadge = `<span class="fecha-badge ${cls}">${label}</span>`;
+        var d   = new Date(f + 'T00:00:00');
+        var lbl = d.toLocaleDateString('es-ES', { day:'numeric', month:'short' });
+        var cls = f === hoyStr ? 'hoy' : f < hoyStr ? 'pasada' : 'futura';
+        fechaBadge = '<span class="fecha-badge ' + cls + '">' + lbl + '</span>';
       }
-      const horaStr = p.hora ? `<span class="td-hora" style="display:block;margin-top:3px;font-size:13px;">${p.hora}</span>` : '';
-      const recogidaHtml = (fechaBadge || horaStr) ? `${fechaBadge}${horaStr}` : '—';
+      var horaStr     = p.hora ? '<span class="td-hora" style="display:block;margin-top:3px;font-size:13px;">' + esc(p.hora) + '</span>' : '';
+      var recogidaHtml = (fechaBadge || horaStr) ? fechaBadge + horaStr : '—';
+      var telHtml     = esc(p.telefono || '') || '—';
 
-      return `
-      <tr class="${p.estado==='entregado'?'entregado':''}" style="cursor:pointer;" onclick="abrirDetalle(${p.id},event)">
-        <td class="td-cliente">${esc(p.cliente)}</td>
-        <td style="white-space:nowrap;">${recogidaHtml}</td>
-        <td class="td-detalle">${esc(p.detalle)}</td>
-        <td><span class="cat cat-${p.cat}">${cap(CAT_LABELS[p.cat])}</span></td>
-        <td onclick="event.stopPropagation()"><span class="estado estado-${p.estado}" onclick="avanzar(${p.id})" title="Clic para cambiar estado">${cap(p.estado)}</span></td>
-        <td class="td-nota" onclick="event.stopPropagation()"><input type="text" value="${esc(p.notas)}" placeholder="Notas..." onchange="setNota(${p.id},this.value)"></td>
-        <td onclick="event.stopPropagation()"><button class="btn-del" onclick="del(${p.id})" title="Eliminar">×</button></td>
-      </tr>`;
+      return '<tr class="' + (p.estado === 'entregado' ? 'entregado' : '') + '" style="cursor:pointer" onclick="abrirDetalle(' + p.id + ',event)">'
+        + '<td class="td-cliente">' + esc(p.cliente) + '</td>'
+        + '<td style="color:var(--text2);font-size:13px;">' + telHtml + '</td>'
+        + '<td style="white-space:nowrap">' + recogidaHtml + '</td>'
+        + '<td class="td-detalle">' + esc(p.detalle) + '</td>'
+        + '<td><span class="cat cat-' + p.cat + '">' + cap(CAT_LABELS[p.cat] || p.cat) + '</span></td>'
+        + '<td onclick="event.stopPropagation()"><span class="estado estado-' + p.estado + '" onclick="avanzar(' + p.id + ')" title="Clic para cambiar estado">' + cap(p.estado) + '</span></td>'
+        + '<td class="td-nota" onclick="event.stopPropagation()"><input type="text" value="' + esc(p.notas) + '" placeholder="Notas..." onchange="setNota(' + p.id + ',this.value)"></td>'
+        + '<td onclick="event.stopPropagation()"><button class="btn-del" onclick="del(' + p.id + ')" title="Eliminar">\u00d7</button></td>'
+        + '</tr>';
     }).join('');
   }
 
-  function cap(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
-  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-  async function addPedido() {
-    const cliente = document.getElementById('f-cliente').value.trim();
-    const detalle = document.getElementById('f-detalle').value.trim();
+  // ── ACCIONES ──────────────────────────────────────────────────────────
+  function addPedido() {
+    var cliente = document.getElementById('f-cliente').value.trim();
+    var detalle = document.getElementById('f-detalle').value.trim();
     if (!cliente) { document.getElementById('f-cliente').focus(); return; }
     if (!detalle) { document.getElementById('f-detalle').focus(); return; }
+    var fec = document.getElementById('f-fecha').value;
+    var hor = document.getElementById('f-hora').value;
     pedidos.push({
-      id: nextId++,
-      cliente,
-      fecha: document.getElementById('f-fecha').value || '',
-      hora: document.getElementById('f-hora').value || '',
-      detalle,
-      cat: document.getElementById('f-cat').value,
-      estado: 'pendiente',
-      notas: ''
+      id:       nextId++,
+      cliente:  cliente,
+      telefono: document.getElementById('f-telefono').value.trim(),
+      fecha:    fec || '',
+      hora:     hor || '',
+      detalle:  detalle,
+      cat:      document.getElementById('f-cat').value,
+      estado:   'pendiente',
+      notas:    ''
     });
-    const _fec = document.getElementById('f-fecha').value;
-    const _hor = document.getElementById('f-hora').value;
-    document.getElementById('f-cliente').value = '';
-    document.getElementById('f-detalle').value = '';
-    document.getElementById('f-hora').value = '';
-    document.getElementById('f-fecha').value = new Date().toISOString().slice(0,10);
+    // limpiar form
+    document.getElementById('f-cliente').value  = '';
+    document.getElementById('f-telefono').value = '';
+    document.getElementById('f-detalle').value  = '';
+    document.getElementById('f-hora').value     = '';
+    document.getElementById('f-fecha').value    = new Date().toISOString().slice(0, 10);
     document.getElementById('f-cliente').focus();
-    await guardar(); render();
-    const _fd = _fec ? new Date(_fec+'T00:00:00').toLocaleDateString('es-ES',{day:'numeric',month:'short'}) : '';
-    const _fh = _hor || '';
-    const _cuando = [_fd, _fh].filter(Boolean).join(' · ');
-    toast('Pedido añadido' + (_cuando ? '  ·  ' + _cuando : ''));
+    render();
+    guardar();
+    var fd     = fec ? new Date(fec + 'T00:00:00').toLocaleDateString('es-ES', { day:'numeric', month:'short' }) : '';
+    var cuando = [fd, hor].filter(Boolean).join(' · ');
+    toast('Pedido añadido' + (cuando ? '  ·  ' + cuando : ''));
   }
 
-  async function avanzar(id) {
-    const p = pedidos.find(x=>x.id===id);
+  function avanzar(id) {
+    var p = pedidos.find(function(x) { return x.id === id; });
     if (!p) return;
-    const next = ESTADOS[(ESTADOS.indexOf(p.estado)+1) % ESTADOS.length];
+    var next = ESTADOS[(ESTADOS.indexOf(p.estado) + 1) % ESTADOS.length];
     p.estado = next;
-    await guardar(); render();
-    const labels = {pendiente:'Pendiente',preparando:'Preparando',listo:'Listo ✓',entregado:'Entregado'};
+    render(); guardar();
+    var labels = { pendiente:'Pendiente', preparando:'Preparando', listo:'Listo ✓', entregado:'Entregado' };
     toast(p.cliente + ' → ' + labels[next]);
   }
 
-  async function setNota(id, val) {
-    const p = pedidos.find(x=>x.id===id);
-    if (p) { p.notas = val; await guardar(); }
+  function setNota(id, val) {
+    var p = pedidos.find(function(x) { return x.id === id; });
+    if (p) { p.notas = val; guardar(); }
   }
 
-  async function del(id) {
-    const p = pedidos.find(x=>x.id===id);
+  function del(id) {
+    var p = pedidos.find(function(x) { return x.id === id; });
     if (p && confirm('¿Eliminar el pedido de ' + p.cliente + '?')) {
-      pedidos = pedidos.filter(x=>x.id!==id);
-      await guardar(); render();
+      pedidos = pedidos.filter(function(x) { return x.id !== id; });
+      render(); guardar();
     }
   }
 
-  async function limpiarEntregados() {
-    const n = pedidos.filter(p=>p.estado==='entregado').length;
+  function limpiarEntregados() {
+    var n = pedidos.filter(function(p) { return p.estado === 'entregado'; }).length;
     if (!n) { toast('No hay entregados'); return; }
     if (confirm('¿Eliminar ' + n + ' pedido(s) entregado(s)?')) {
-      pedidos = pedidos.filter(p=>p.estado!=='entregado');
-      await guardar(); render();
+      pedidos = pedidos.filter(function(p) { return p.estado !== 'entregado'; });
+      render(); guardar();
       toast(n + ' pedido(s) eliminados');
     }
   }
 
   function exportCSV() {
-    const hoy = new Date().toISOString().slice(0,10);
-    const header = 'Cliente,Fecha recogida,Hora,Pedido,Categoría,Estado,Notas';
-    const rows = pedidos.map(p =>
-      [p.cliente, p.fecha||'', p.hora||'', p.detalle, CAT_LABELS[p.cat], p.estado, p.notas]
-        .map(v => '"' + String(v).replace(/"/g,'""') + '"').join(','));
-    const csv = '\uFEFF' + [header,...rows].join('\n');
-    const a = document.createElement('a');
-    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+    var hoy    = new Date().toISOString().slice(0, 10);
+    var header = 'Cliente,Teléfono,Fecha recogida,Hora,Pedido,Categoría,Estado,Notas';
+    var rows   = pedidos.map(function(p) {
+      return [p.cliente, p.telefono||'', p.fecha||'', p.hora||'', p.detalle, CAT_LABELS[p.cat], p.estado, p.notas]
+        .map(function(v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(',');
+    });
+    var csv = '\uFEFF' + [header].concat(rows).join('\n');
+    var a = document.createElement('a');
+    a.href     = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
     a.download = 'pedidos_' + hoy + '.csv';
     a.click();
     toast('CSV exportado');
   }
 
   function exportTexto() {
-    const hoy = new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
-    const activos = pedidos.filter(p=>p.estado!=='entregado');
+    var hoy    = new Date().toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long' });
+    var activos = pedidos.filter(function(p) { return p.estado !== 'entregado'; });
     if (!activos.length) { toast('No hay pedidos activos'); return; }
-    const txt = '📋 PEDIDOS ' + hoy.toUpperCase() + '\n\n' +
-      activos.map(p => {
-        const fecha = p.fecha ? new Date(p.fecha+'T00:00:00').toLocaleDateString('es-ES',{weekday:'short',day:'numeric',month:'short'}) : '—';
-        return `${fecha} ${p.hora||''}  ${p.cliente}\n   ${p.detalle}${p.notas?' ('+p.notas+')':''}\n   Estado: ${p.estado.toUpperCase()}`;
+    var txt = '📋 PEDIDOS ' + hoy.toUpperCase() + '\n\n' +
+      activos.map(function(p) {
+        var fecha = p.fecha ? new Date(p.fecha + 'T00:00:00').toLocaleDateString('es-ES', { weekday:'short', day:'numeric', month:'short' }) : '—';
+        return fecha + ' ' + (p.hora||'') + '  ' + p.cliente + (p.telefono ? ' · ' + p.telefono : '') + '\n   ' + p.detalle + (p.notas ? ' (' + p.notas + ')' : '') + '\n   Estado: ' + p.estado.toUpperCase();
       }).join('\n\n');
-    navigator.clipboard.writeText(txt).then(() => toast('Resumen copiado al portapapeles'));
+    navigator.clipboard.writeText(txt).then(function() { toast('Resumen copiado al portapapeles'); });
   }
 
   function setFiltro(f, btn) {
     filtro = f;
-    document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('on'));
+    document.querySelectorAll('.f-btn').forEach(function(b) { b.classList.remove('on'); });
     btn.classList.add('on');
     render();
   }
 
-  document.getElementById('f-detalle').addEventListener('keydown', e => {
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) addPedido();
-  });
-
-  document.getElementById('f-fecha').value = new Date().toISOString().slice(0,10);
-
-  function abrirDetalle(id, e) {
-    const p = pedidos.find(x=>x.id===id);
-    if (!p) return;
-    const hoyStr = new Date().toISOString().slice(0,10);
-    const f = p.fecha || '';
-    let fechaLabel = '—';
-    if (f) {
-      const d = new Date(f+'T00:00:00');
-      fechaLabel = d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-    }
-    const estadoColors = {
-      pendiente:['#fde8e8','#9a1010'],
-      preparando:['#deeeff','#1244a0'],
-      listo:['#e8f5d0','#3a6608'],
-      entregado:['#edeae6','#7a6e64']
-    };
-    const [bg, col] = estadoColors[p.estado] || ['#eee','#333'];
-
-    document.getElementById('detalle-titulo').textContent = p.cliente;
-    document.getElementById('detalle-body').innerHTML = `
-      <div style="margin-bottom:20px;">
-        <div style="display:inline-block;background:${bg};color:${col};border-radius:24px;padding:5px 16px;font-size:13px;font-weight:700;letter-spacing:0.04em;margin-bottom:16px;">${p.estado.toUpperCase()}</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
-          <div style="background:#f5f1ec;border-radius:10px;padding:12px 14px;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#a89e93;text-transform:uppercase;margin-bottom:4px;">Fecha</div>
-            <div style="font-size:14px;color:#2a2017;">${fechaLabel}</div>
-          </div>
-          <div style="background:#f5f1ec;border-radius:10px;padding:12px 14px;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#a89e93;text-transform:uppercase;margin-bottom:4px;">Hora</div>
-            <div style="font-size:20px;font-weight:700;color:#5c3d1e;">${p.hora||'—'}</div>
-          </div>
-        </div>
-        <div style="background:#f5f1ec;border-radius:10px;padding:14px;margin-bottom:12px;">
-          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#a89e93;text-transform:uppercase;margin-bottom:8px;">Pedido</div>
-          <div style="font-size:14px;color:#2a2017;line-height:1.6;white-space:pre-wrap;">${esc(p.detalle)}</div>
-        </div>
-        ${p.notas ? `<div style="background:#fff8e8;border:1px solid #e8d090;border-radius:10px;padding:14px;margin-bottom:12px;">
-          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#8b6200;text-transform:uppercase;margin-bottom:6px;">Notas</div>
-          <div style="font-size:14px;color:#6b4f2a;">${esc(p.notas)}</div>
-        </div>` : ''}
-        <div style="background:#f5f1ec;border-radius:10px;padding:12px 14px;margin-bottom:20px;">
-          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#a89e93;text-transform:uppercase;margin-bottom:4px;">Categoría</div>
-          <div style="font-size:14px;color:#2a2017;">${cap(CAT_LABELS[p.cat])}</div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:#8b6340;text-transform:uppercase;margin-bottom:2px;">Cambiar estado</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            ${['pendiente','preparando','listo','entregado'].map(s=>`
-              <button onclick="cambiarEstadoDetalle(${p.id},'${s}')" style="flex:1;min-width:80px;padding:8px 6px;border-radius:12px;border:2px solid ${s===p.estado?col:'#ddd6cc'};background:${s===p.estado?bg:'#f7f3ee'};color:${s===p.estado?col:'#a89e93'};font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;">${s}</button>
-            `).join('')}
-          </div>
-        </div>
-      </div>
-    `;
-    document.getElementById('detalle-overlay').style.display = 'block';
-    document.getElementById('detalle-panel').style.display = 'block';
+  function setFiltroStat(f) {
+    var map = { todos:'stat-total', pendiente:'stat-pend', listo:'stat-listo', entregado:'stat-entre' };
+    filtro = f;
+    document.querySelectorAll('.stat').forEach(function(s) { s.classList.remove('active'); });
+    if (map[f]) document.getElementById(map[f]).classList.add('active');
+    document.querySelectorAll('.f-btn').forEach(function(b) { b.classList.remove('on'); });
+    document.querySelectorAll('.f-btn').forEach(function(b) {
+      if (b.textContent.toLowerCase().includes(f === 'todos' ? 'todos' : f.slice(0,4))) b.classList.add('on');
+    });
+    render();
   }
 
-  async function cambiarEstadoDetalle(id, nuevoEstado) {
-    const p = pedidos.find(x=>x.id===id);
+  // ── DETALLE PANEL ─────────────────────────────────────────────────────
+  function abrirDetalle(id, e) {
+    var p = pedidos.find(function(x) { return x.id === id; });
+    if (!p) return;
+    var f = p.fecha || '';
+    var fechaLabel = '—';
+    if (f) {
+      var d = new Date(f + 'T00:00:00');
+      fechaLabel = d.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    }
+    var sc = { pendiente:['#fde8e8','#9a1010'], preparando:['#deeeff','#1244a0'], listo:['#e8f5d0','#3a6608'], entregado:['#edeae6','#7a6e64'] };
+    var bg  = (sc[p.estado] || ['#eee','#333'])[0];
+    var col = (sc[p.estado] || ['#eee','#333'])[1];
+
+    document.getElementById('detalle-titulo').textContent = p.cliente;
+    document.getElementById('detalle-body').innerHTML =
+      '<div style="margin-bottom:20px;">'
+      + '<div style="display:inline-block;background:' + bg + ';color:' + col + ';border-radius:24px;padding:5px 16px;font-size:13px;font-weight:700;margin-bottom:16px;">' + p.estado.toUpperCase() + '</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">'
+        + '<div style="background:#f5f1ec;border-radius:10px;padding:12px 14px;">'
+          + '<div style="font-size:11px;font-weight:700;color:#a89e93;text-transform:uppercase;margin-bottom:4px;">Teléfono</div>'
+          + '<div style="font-size:14px;color:#2a2017;">' + esc(p.telefono || '—') + '</div>'
+        + '</div>'
+        + '<div style="background:#f5f1ec;border-radius:10px;padding:12px 14px;">'
+          + '<div style="font-size:11px;font-weight:700;color:#a89e93;text-transform:uppercase;margin-bottom:4px;">Fecha</div>'
+          + '<div style="font-size:14px;color:#2a2017;">' + fechaLabel + '</div>'
+        + '</div>'
+        + '<div style="background:#f5f1ec;border-radius:10px;padding:12px 14px;">'
+          + '<div style="font-size:11px;font-weight:700;color:#a89e93;text-transform:uppercase;margin-bottom:4px;">Hora</div>'
+          + '<div style="font-size:20px;font-weight:700;color:#5c3d1e;">' + (p.hora || '—') + '</div>'
+        + '</div>'
+      + '</div>'
+      + '<div style="background:#f5f1ec;border-radius:10px;padding:14px;margin-bottom:12px;">'
+        + '<div style="font-size:11px;font-weight:700;color:#a89e93;text-transform:uppercase;margin-bottom:8px;">Pedido</div>'
+        + '<div style="font-size:14px;color:#2a2017;line-height:1.6;white-space:pre-wrap;">' + esc(p.detalle) + '</div>'
+      + '</div>'
+      + (p.notas ? '<div style="background:#fff8e8;border:1px solid #e8d090;border-radius:10px;padding:14px;margin-bottom:12px;">'
+          + '<div style="font-size:11px;font-weight:700;color:#8b6200;text-transform:uppercase;margin-bottom:6px;">Notas</div>'
+          + '<div style="font-size:14px;color:#6b4f2a;">' + esc(p.notas) + '</div>'
+        + '</div>' : '')
+      + '<div style="background:#f5f1ec;border-radius:10px;padding:12px 14px;margin-bottom:20px;">'
+        + '<div style="font-size:11px;font-weight:700;color:#a89e93;text-transform:uppercase;margin-bottom:4px;">Categoría</div>'
+        + '<div style="font-size:14px;color:#2a2017;">' + (CAT_LABELS[p.cat] || p.cat) + '</div>'
+      + '</div>'
+      + '<div style="display:flex;flex-direction:column;gap:8px;">'
+        + '<div style="font-size:11px;font-weight:700;color:#8b6340;text-transform:uppercase;margin-bottom:2px;">Cambiar estado</div>'
+        + '<div style="display:flex;gap:8px;flex-wrap:wrap;">'
+        + ESTADOS.map(function(s) {
+            return '<button onclick="cambiarEstadoDetalle(' + p.id + ',\'' + s + '\')" style="flex:1;min-width:80px;padding:8px 6px;border-radius:12px;border:2px solid ' + (s === p.estado ? col : '#ddd6cc') + ';background:' + (s === p.estado ? bg : '#f7f3ee') + ';color:' + (s === p.estado ? col : '#a89e93') + ';font-size:12px;font-weight:700;cursor:pointer;font-family:\'Nunito\',sans-serif;">' + s + '</button>';
+          }).join('')
+        + '</div>'
+      + '</div>'
+      + '</div>';
+
+    document.getElementById('detalle-overlay').style.display = 'block';
+    document.getElementById('detalle-panel').style.display   = 'block';
+  }
+
+  function cambiarEstadoDetalle(id, nuevoEstado) {
+    var p = pedidos.find(function(x) { return x.id === id; });
     if (!p) return;
     p.estado = nuevoEstado;
-    await guardar(); render();
+    render(); guardar();
     abrirDetalle(id, null);
     toast(p.cliente + ' → ' + nuevoEstado);
   }
 
   function cerrarDetalle() {
     document.getElementById('detalle-overlay').style.display = 'none';
-    document.getElementById('detalle-panel').style.display = 'none';
+    document.getElementById('detalle-panel').style.display   = 'none';
   }
 
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarDetalle(); });
-
-
-  function setFiltroStat(f) {
-    const map = { todos:'stat-total', pendiente:'stat-pend', listo:'stat-listo', entregado:'stat-entre' };
-    filtro = f;
-    document.querySelectorAll('.stat').forEach(s => s.classList.remove('active'));
-    if (map[f]) document.getElementById(map[f]).classList.add('active');
-    document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('on'));
-    const btns = document.querySelectorAll('.f-btn');
-    btns.forEach(b => { if (b.textContent.toLowerCase().includes(f === 'todos' ? 'todos' : f.slice(0,4))) b.classList.add('on'); });
-    render();
-  }
-
-  document.getElementById('f-detalle').addEventListener('keydown', e => {
+  // ── INIT ──────────────────────────────────────────────────────────────
+  document.getElementById('f-fecha').value = new Date().toISOString().slice(0, 10);
+  document.getElementById('f-detalle').addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) addPedido();
   });
-  document.getElementById('f-fecha').value = new Date().toISOString().slice(0,10);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarDetalle(); });
-  (async () => { await cargar(); render(); })();
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') cerrarDetalle(); });
+
+  cargar().then(function() { render(); });
+
 </script>
 </body>
 </html>
