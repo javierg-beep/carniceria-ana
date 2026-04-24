@@ -708,21 +708,11 @@
         if (raw) d = JSON.parse(raw);
       } catch(e) {}
     }
-    if (d && Array.isArray(d.pedidos) && d.pedidos.length) {
+    if (d && Array.isArray(d.pedidos)) {
       pedidos = d.pedidos;
-      nextId  = d.nextId || (Math.max(...pedidos.map(p => p.id)) + 1);
-    } else {
-      // datos de ejemplo solo la primera vez
-      const hoy   = new Date().toISOString().slice(0, 10);
-      const manana = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
-      pedidos = [
-        { id:1, cliente:'María García',   telefono:'611 222 333', fecha:hoy,    hora:'10:00', detalle:'Entrecot ternera 800g + chuletas cerdo x4', cat:'carne',   estado:'listo',      notas:'' },
-        { id:2, cliente:'Juan Rodríguez', telefono:'',             fecha:hoy,    hora:'13:00', detalle:'Bandeja mixta barbacoa 1kg',                cat:'bandeja', estado:'pendiente',  notas:'Sin picante' },
-        { id:3, cliente:'Ana Martínez',   telefono:'699 000 111', fecha:manana, hora:'11:30', detalle:'Pollo entero + costillas cerdo',            cat:'bandeja', estado:'preparando', notas:'Sábado' },
-        { id:4, cliente:'Luis Pérez',     telefono:'',             fecha:hoy,    hora:'09:30', detalle:'Leche, pan, aceite, huevos x12',           cat:'super',   estado:'entregado',  notas:'' }
-      ];
-      nextId = 5;
+      nextId  = d.nextId || (pedidos.length ? Math.max(...pedidos.map(function(p) { return p.id; })) + 1 : 1);
     }
+    // sin datos de ejemplo — empieza vacío en la primera visita
   }
 
   // ── UTILS ─────────────────────────────────────────────────────────────
