@@ -831,7 +831,27 @@
       </div>
       <div class="fg">
         <label>Hora recogida</label>
-        <input type="time" id="f-hora">
+        <select id="f-hora">
+          <option value="">— Hora —</option>
+          <option value="09:00">09:00</option>
+          <option value="09:30">09:30</option>
+          <option value="10:00">10:00</option>
+          <option value="10:30">10:30</option>
+          <option value="11:00">11:00</option>
+          <option value="11:30">11:30</option>
+          <option value="12:00">12:00</option>
+          <option value="12:30">12:30</option>
+          <option value="13:00">13:00</option>
+          <option value="13:30">13:30</option>
+          <option value="14:00">14:00</option>
+          <option value="17:00">17:00</option>
+          <option value="17:30">17:30</option>
+          <option value="18:00">18:00</option>
+          <option value="18:30">18:30</option>
+          <option value="19:00">19:00</option>
+          <option value="19:30">19:30</option>
+          <option value="20:00">20:00</option>
+        </select>
       </div>
       <div class="fg">
         <label>Categoría</label>
@@ -943,7 +963,27 @@
       </div>
       <div class="fg">
         <label>Hora</label>
-        <input type="time" id="m-hora">
+        <select id="m-hora">
+        <option value="">— Hora —</option>
+        <option value="09:00">09:00</option>
+        <option value="09:30">09:30</option>
+        <option value="10:00">10:00</option>
+        <option value="10:30">10:30</option>
+        <option value="11:00">11:00</option>
+        <option value="11:30">11:30</option>
+        <option value="12:00">12:00</option>
+        <option value="12:30">12:30</option>
+        <option value="13:00">13:00</option>
+        <option value="13:30">13:30</option>
+        <option value="14:00">14:00</option>
+        <option value="17:00">17:00</option>
+        <option value="17:30">17:30</option>
+        <option value="18:00">18:00</option>
+        <option value="18:30">18:30</option>
+        <option value="19:00">19:00</option>
+        <option value="19:30">19:30</option>
+        <option value="20:00">20:00</option>
+      </select>
       </div>
     </div>
     <div class="fg">
@@ -1196,7 +1236,7 @@
     document.getElementById('f-cliente').value  = '';
     document.getElementById('f-telefono').value = '';
     document.getElementById('f-detalle').value  = '';
-    document.getElementById('f-hora').value     = '';
+    document.getElementById('f-hora').value     = '';  // select reset
     document.getElementById('f-fecha').value    = new Date().toISOString().slice(0, 10);
     document.getElementById('f-encargado').value = '';
     document.getElementById('f-encargado-otro').value = '';
@@ -1444,7 +1484,7 @@
     document.getElementById('m-cliente').value  = '';
     document.getElementById('m-telefono').value = '';
     document.getElementById('m-detalle').value  = '';
-    document.getElementById('m-hora').value     = '';
+    document.getElementById('m-hora').value     = '';  // select reset
     document.getElementById('m-encargado').value = '';
     document.getElementById('m-encargado-otro').value = '';
     document.getElementById('m-encargado-otro').classList.remove('visible');
