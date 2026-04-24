@@ -536,6 +536,7 @@
     </div>
   </div>
   <div class="header-right">
+    <div class="header-date" id="header-date"></div>
     <div class="header-badge" id="header-badge"><span class="live-dot"></span><span id="header-badge-text">0 pedidos activos</span></div>
   </div>
 </header>
@@ -738,18 +739,19 @@
 
   // ── RENDER ────────────────────────────────────────────────────────────
   function render() {
+    // helper null-safe
+    function setEl(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
+
     // header
-    document.getElementById('header-date').textContent =
-      new Date().toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long' });
-    const activos = pedidos.filter(p => p.estado !== 'entregado').length;
-    const badge = document.getElementById('header-badge-text');
-    if (badge) badge.textContent = activos === 1 ? '1 pedido activo' : activos + ' pedidos activos';
+    setEl('header-date', new Date().toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long' }));
+    var activos = pedidos.filter(function(p) { return p.estado !== 'entregado'; }).length;
+    setEl('header-badge-text', activos === 1 ? '1 pedido activo' : activos + ' pedidos activos');
 
     // stats
-    document.getElementById('s-total').textContent = pedidos.length;
-    document.getElementById('s-pend').textContent  = pedidos.filter(p => p.estado === 'pendiente').length;
-    document.getElementById('s-listo').textContent = pedidos.filter(p => p.estado === 'listo').length;
-    document.getElementById('s-entre').textContent = pedidos.filter(p => p.estado === 'entregado').length;
+    setEl('s-total', pedidos.length);
+    setEl('s-pend',  pedidos.filter(function(p) { return p.estado === 'pendiente'; }).length);
+    setEl('s-listo', pedidos.filter(function(p) { return p.estado === 'listo'; }).length);
+    setEl('s-entre', pedidos.filter(function(p) { return p.estado === 'entregado'; }).length);
 
     // tabla
     const vis  = filtro === 'todos' ? pedidos : pedidos.filter(p => p.estado === filtro);
