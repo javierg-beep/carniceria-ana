@@ -680,39 +680,64 @@
   let nextId  = 1;
   let filtro  = 'todos';
 
-  // ── STORAGE ───────────────────────────────────────────────────────────
-  const SK = 'pedidos_ana_v2';
-  const useWindowStorage = typeof window.storage !== 'undefined' && typeof window.storage.get === 'function';
+  // ── FIRESTORE ────────────────────────────────────────────────────────
+  var db = null;
+  var pedidosColRef = null;
 
-  function guardar() {
-    const str = JSON.stringify({ pedidos, nextId });
-    if (useWindowStorage) {
-      try { window.storage.set(SK, str); } catch(e) {}
-    } else {
-      try { localStorage.setItem(SK, str); } catch(e) {}
+  async function initFirestore() {
+    try {
+      const { initializeApp } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js');
+      const { getFirestore, collection, getDocs, setDoc, deleteDoc, doc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
+      const firebaseConfig = {
+        apiKey: "AIzaSyAJRZ_IEWcdAUOvV3BNfKC4Hh6m9ke56nM",
+        authDomain: "carniceria-ana-pedidos.firebaseapp.com",
+        projectId: "carniceria-ana-pedidos",
+        storageBucket: "carniceria-ana-pedidos.firebasestorage.app",
+        messagingSenderId: "25903015375",
+        appId: "1:25903015375:web:61815d111ac8cd0012deba"
+      };
+      const app = initializeApp(firebaseConfig);
+      db = getFirestore(app);
+      pedidosColRef = collection(db, 'pedidos');
+
+      // Escucha cambios en tiempo real → re-renderiza automáticamente
+      onSnapshot(pedidosColRef, function(snapshot) {
+        pedidos = snapshot.docs.map(function(d) { return d.data(); });
+        pedidos.sort(function(a,b) { return a.id - b.id; });
+        nextId = pedidos.length ? Math.max.apply(null, pedidos.map(function(p){ return p.id; })) + 1 : 1;
+        render();
+      });
+      return true;
+    } catch(e) {
+      console.error('Firestore error:', e);
+      return false;
     }
   }
 
+  async function guardar() {
+    if (!db || !pedidosColRef) return;
+    try {
+      const { setDoc, doc, deleteDoc, getDocs } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js');
+      // Sincroniza todos los pedidos: escribe los actuales, borra los eliminados
+      const snapshot = await getDocs(pedidosColRef);
+      const existingIds = snapshot.docs.map(function(d) { return d.id; });
+      const currentIds  = pedidos.map(function(p) { return String(p.id); });
+      // Borrar los que ya no existen
+      for (var i = 0; i < existingIds.length; i++) {
+        if (currentIds.indexOf(existingIds[i]) === -1) {
+          await deleteDoc(doc(db, 'pedidos', existingIds[i]));
+        }
+      }
+      // Escribir / actualizar los actuales
+      for (var j = 0; j < pedidos.length; j++) {
+        await setDoc(doc(db, 'pedidos', String(pedidos[j].id)), pedidos[j]);
+      }
+    } catch(e) { console.error('guardar error:', e); }
+  }
+
   async function cargar() {
-    let d = null;
-    if (useWindowStorage) {
-      // Claude artifact context → window.storage
-      try {
-        const r = await window.storage.get(SK);
-        if (r && r.value) d = JSON.parse(r.value);
-      } catch(e) {}
-    } else {
-      // Navegador normal (GitHub Pages, local, etc.) → localStorage
-      try {
-        const raw = localStorage.getItem(SK);
-        if (raw) d = JSON.parse(raw);
-      } catch(e) {}
-    }
-    if (d && Array.isArray(d.pedidos)) {
-      pedidos = d.pedidos;
-      nextId  = d.nextId || (pedidos.length ? Math.max(...pedidos.map(function(p) { return p.id; })) + 1 : 1);
-    }
-    // sin datos de ejemplo — empieza vacío en la primera visita
+    await initFirestore();
+    // onSnapshot ya carga los datos y llama a render()
   }
 
   // ── UTILS ─────────────────────────────────────────────────────────────
@@ -975,7 +1000,7 @@
   });
   document.addEventListener('keydown', function(e) { if (e.key === 'Escape') cerrarDetalle(); });
 
-  cargar().then(function() { render(); });
+  cargar(); // onSnapshot se encarga de llamar render()
 
 </script>
 </body>
