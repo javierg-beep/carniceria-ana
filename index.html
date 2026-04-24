@@ -284,14 +284,17 @@
       transition: all 0.15s;
     }
     .f-btn:hover { border-color: #61a60e; color: #61a60e; }
-    .f-btn.on { background: #61a60e; color: #fff; border-color: #61a60e; }
-
-    /* Hover diferenciado por filtro — colores alineados con las secciones de stats */
-    .f-btn.fb-todos:hover      { border-color: #c08840; color: #8b4e10; }
-    .f-btn.fb-pendiente:hover  { border-color: #c04040; color: #b52020; }
-    .f-btn.fb-preparando:hover { border-color: #3070c0; color: #1244a0; }
-    .f-btn.fb-listo:hover      { border-color: #61a60e; color: #3a6608; }
-    .f-btn.fb-entregado:hover  { border-color: #9a9088; color: #6b5f52; }
+    /* Hover y activo por filtro — consonancia con colores de estado */
+    .f-btn.fb-todos:hover                    { border-color: #999; color: #444; }
+    .f-btn.fb-todos.on                       { background: #555; color: #fff; border-color: #555; }
+    .f-btn.fb-pendiente:hover                { border-color: #e09090; color: #9a1010; }
+    .f-btn.fb-pendiente.on                   { background: #9a1010; color: #fff; border-color: #9a1010; }
+    .f-btn.fb-preparando:hover               { border-color: #f0b870; color: #b85c00; }
+    .f-btn.fb-preparando.on                  { background: #b85c00; color: #fff; border-color: #b85c00; }
+    .f-btn.fb-listo:hover                    { border-color: #90bef0; color: #1244a0; }
+    .f-btn.fb-listo.on                       { background: #1244a0; color: #fff; border-color: #1244a0; }
+    .f-btn.fb-entregado:hover                { border-color: #9acc60; color: #3a6608; }
+    .f-btn.fb-entregado.on                   { background: #3a6608; color: #fff; border-color: #3a6608; }
     .actions { display: flex; gap: 8px; flex-wrap: wrap; }
     .btn-sec {
       background: var(--surface2);
@@ -387,9 +390,9 @@
     }
     .estado:hover { filter: brightness(1.2); transform: scale(1.05); }
     .estado-pendiente  { background: #fde8e8; color: #9a1010; border-color: #e09090; }
-    .estado-preparando { background: #deeeff; color: #1244a0; border-color: #90bef0; }
-    .estado-listo      { background: #e8f5d0; color: #3a6608; border-color: #9acc60; }
-    .estado-entregado  { background: #edeae6; color: #7a6e64; border-color: #ccc4bc; }
+    .estado-preparando { background: #fff3e0; color: #b85c00; border-color: #f0b870; }
+    .estado-listo      { background: #ddeeff; color: #1244a0; border-color: #90bef0; }
+    .estado-entregado  { background: #e8f5d0; color: #3a6608; border-color: #9acc60; }
 
     /* campo notas inline */
     .td-nota input {
@@ -693,6 +696,8 @@
     .form-modal-body .fg select:focus,
     .form-modal-body .fg textarea:focus { border-color: #61a60e; }
     .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .encargado-otro { display: none; margin-top: 6px; }
+    .encargado-otro.visible { display: block; }
     .btn-add-modal {
       width: 100%;
       height: 52px;
@@ -838,6 +843,20 @@
           <option value="completo">🛍️ Completo (Carne+Super)</option>
         </select>
       </div>
+      <div class="fg">
+        <label>Encargado</label>
+        <select id="f-encargado" onchange="toggleOtroDesktop()">
+          <option value="">— Sin asignar —</option>
+          <option value="Aitor">Aitor</option>
+          <option value="Ana">Ana</option>
+          <option value="Cristina">Cristina</option>
+          <option value="Hortensia">Hortensia</option>
+          <option value="Mari">Mari</option>
+          <option value="Miguel">Miguel</option>
+          <option value="otro">Otr@</option>
+        </select>
+        <input type="text" id="f-encargado-otro" class="encargado-otro" placeholder="Escribe el nombre...">
+      </div>
       <div class="fg fg-full">
         <label>Detalle del pedido</label>
         <textarea id="f-detalle" placeholder="Piezas, pesos, cortes, preferencias, alergias..."></textarea>
@@ -938,6 +957,20 @@
       </select>
     </div>
     <div class="fg">
+      <label>Encargado</label>
+      <select id="m-encargado" onchange="toggleOtroModal()">
+        <option value="">— Sin asignar —</option>
+        <option value="Aitor">Aitor</option>
+        <option value="Ana">Ana</option>
+        <option value="Cristina">Cristina</option>
+        <option value="Hortensia">Hortensia</option>
+        <option value="Mari">Mari</option>
+        <option value="Miguel">Miguel</option>
+        <option value="otro">Otr@</option>
+      </select>
+      <input type="text" id="m-encargado-otro" class="encargado-otro" placeholder="Escribe el nombre...">
+    </div>
+    <div class="fg">
       <label>Detalle del pedido</label>
       <textarea id="m-detalle" placeholder="Piezas, pesos, cortes, preferencias..."></textarea>
     </div>
@@ -961,6 +994,30 @@
   const CAT_LABELS = { carne:'Carnicería', super:'Supermercado', bandeja:'Bandejas especiales', bar:'Bares', completo:'Completo (Carne+Super)' };
   const ESTADOS    = ['pendiente','preparando','listo','entregado'];
   const ESTADO_LABELS = { pendiente:'Pendiente', preparando:'Preparando', listo:'Listo', entregado:'Entregado' };
+
+  function getEncargado(selectId, otroId) {
+    var sel = document.getElementById(selectId);
+    if (!sel) return '';
+    if (sel.value === 'otro') {
+      var otro = document.getElementById(otroId);
+      return otro ? otro.value.trim() : '';
+    }
+    return sel.value;
+  }
+  function toggleOtroDesktop() {
+    var sel = document.getElementById('f-encargado');
+    var inp = document.getElementById('f-encargado-otro');
+    if (!inp) return;
+    inp.classList.toggle('visible', sel.value === 'otro');
+    if (sel.value === 'otro') inp.focus();
+  }
+  function toggleOtroModal() {
+    var sel = document.getElementById('m-encargado');
+    var inp = document.getElementById('m-encargado-otro');
+    if (!inp) return;
+    inp.classList.toggle('visible', sel.value === 'otro');
+    if (sel.value === 'otro') inp.focus();
+  }
   let pedidos = [];
   let nextId  = 1;
   let filtro  = 'todos';
@@ -1127,6 +1184,7 @@
       id:       nextId++,
       cliente:  cliente,
       telefono: document.getElementById('f-telefono').value.trim(),
+      encargado: getEncargado('f-encargado','f-encargado-otro'),
       fecha:    fec || '',
       hora:     hor || '',
       detalle:  detalle,
@@ -1140,6 +1198,9 @@
     document.getElementById('f-detalle').value  = '';
     document.getElementById('f-hora').value     = '';
     document.getElementById('f-fecha').value    = new Date().toISOString().slice(0, 10);
+    document.getElementById('f-encargado').value = '';
+    document.getElementById('f-encargado-otro').value = '';
+    document.getElementById('f-encargado-otro').classList.remove('visible');
     document.getElementById('f-cliente').focus();
     render();
     guardar();
@@ -1236,7 +1297,7 @@
       var d = new Date(f + 'T00:00:00');
       fechaLabel = d.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
     }
-    var sc = { pendiente:['#fde8e8','#9a1010'], preparando:['#deeeff','#1244a0'], listo:['#e8f5d0','#3a6608'], entregado:['#edeae6','#7a6e64'] };
+    var sc = { pendiente:['#fde8e8','#9a1010'], preparando:['#fff3e0','#b85c00'], listo:['#ddeeff','#1244a0'], entregado:['#e8f5d0','#3a6608'] };
     var bg  = (sc[p.estado] || ['#eee','#333'])[0];
     var col = (sc[p.estado] || ['#eee','#333'])[1];
 
@@ -1248,6 +1309,10 @@
         + '<div style="background:#f5f1ec;border-radius:10px;padding:12px 14px;">'
           + '<div style="font-size:11px;font-weight:700;color:#a89e93;text-transform:uppercase;margin-bottom:4px;">Teléfono</div>'
           + '<div style="font-size:14px;color:#2a2017;">' + esc(p.telefono || '—') + '</div>'
+        + '</div>'
+        + '<div style="background:#f5f1ec;border-radius:10px;padding:12px 14px;">'
+          + '<div style="font-size:11px;font-weight:700;color:#a89e93;text-transform:uppercase;margin-bottom:4px;">Encargado</div>'
+          + '<div style="font-size:14px;color:#2a2017;">' + esc(p.encargado || '—') + '</div>'
         + '</div>'
         + '<div style="background:#f5f1ec;border-radius:10px;padding:12px 14px;">'
           + '<div style="font-size:11px;font-weight:700;color:#a89e93;text-transform:uppercase;margin-bottom:4px;">Fecha</div>'
@@ -1314,11 +1379,12 @@
       }
       var horaStr = p.hora ? '<span class="pedido-card-hora">' + esc(p.hora) + '</span>' : '';
       var telStr  = p.telefono ? '<div class="pedido-card-tel">📞 ' + esc(p.telefono) + '</div>' : '';
+      var encStr  = p.encargado ? '<span style="display:inline-flex;align-items:center;gap:4px;background:#f0e8ff;color:#6020a0;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:800;">👤 ' + esc(p.encargado) + '</span>' : '';
       var estadoColors = {
         pendiente:  ['#fde8e8','#9a1010','#e09090'],
-        preparando: ['#deeeff','#1244a0','#90bef0'],
-        listo:      ['#e8f5d0','#3a6608','#9acc60'],
-        entregado:  ['#edeae6','#7a6e64','#ccc4bc']
+        preparando: ['#fff3e0','#b85c00','#f0b870'],
+        listo:      ['#ddeeff','#1244a0','#90bef0'],
+        entregado:  ['#e8f5d0','#3a6608','#9acc60']
       };
       var sc  = estadoColors[p.estado] || ['#eee','#333','#ccc'];
       return '<div class="pedido-card' + (p.estado === 'entregado' ? ' entregado' : '') + '" onclick="abrirDetalle(' + p.id + ',event)">'
@@ -1335,6 +1401,7 @@
             + fechaStr
             + horaStr
             + '<span class="cat cat-' + p.cat + '">' + cap(CAT_LABELS[p.cat] || p.cat) + '</span>'
+            + encStr
           + '</div>'
           + '<span class="pedido-card-estado estado-' + p.estado + '" style="background:' + sc[0] + ';color:' + sc[1] + ';border-color:' + sc[2] + ';" onclick="event.stopPropagation();avanzar(' + p.id + ')">' + (ESTADO_LABELS[p.estado] || cap(p.estado)) + '</span>'
         + '</div>'
@@ -1366,6 +1433,7 @@
       id:       nextId++,
       cliente:  cliente,
       telefono: document.getElementById('m-telefono').value.trim(),
+      encargado: getEncargado('m-encargado','m-encargado-otro'),
       fecha:    fec || '',
       hora:     hor || '',
       detalle:  detalle,
@@ -1377,6 +1445,9 @@
     document.getElementById('m-telefono').value = '';
     document.getElementById('m-detalle').value  = '';
     document.getElementById('m-hora').value     = '';
+    document.getElementById('m-encargado').value = '';
+    document.getElementById('m-encargado-otro').value = '';
+    document.getElementById('m-encargado-otro').classList.remove('visible');
     cerrarFormModal();
     render();
     guardar();
